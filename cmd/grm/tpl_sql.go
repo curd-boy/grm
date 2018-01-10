@@ -45,11 +45,15 @@ func {{.Name}}(db grm.DBQuery, req *Req{{.Name}}) (resp {{.Slice}}*Resp{{.Name}}
 		Name: name,
 		Data: req,
 	}
-	_, err = grm.Query(db, Template.Lookup(name), data, &resp, MaxLimit, FieldName, MaxFork)
+	
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), data)
 	if err != nil {
-		return nil, err
+		return 
 	}
-	return resp, nil
+
+	_, err = grm.Query(db, sql, data, &resp, MaxLimit, FieldName, MaxFork)
+	return
 }
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
@@ -68,7 +72,14 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 		Name: name,
 		Data: req,
 	}
-	return grm.ExecRowsAffected(db, Template.Lookup(name), data)
+	
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), data)
+	if err != nil {
+		return 
+	}
+	
+	return grm.ExecRowsAffected(db, sql, data)
 }
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
@@ -83,7 +94,14 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 		Name: name,
 		Data: req,
 	}
-	return grm.ExecRowsAffected(db, Template.Lookup(name), data)
+	
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), data)
+	if err != nil {
+		return 
+	}
+	
+	return grm.ExecRowsAffected(db, sql, data)
 }
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
@@ -98,7 +116,14 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 		Name: name,
 		Data: req,
 	}
-	return grm.ExecLastInsertId(db, Template.Lookup(name), data)
+	
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), data)
+	if err != nil {
+		return 
+	}
+	
+	return grm.ExecLastInsertId(db, sql, data)
 }
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}

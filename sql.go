@@ -31,19 +31,20 @@ type DBQuery interface {
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 }
 
-func Query(db DBQuery, tpl TemplateExecute, req, resp interface{},
-	limit int, fn func(reflect.StructField) string, f int) (int, error) {
+func Execute(tpl TemplateExecute, req interface{}) (string, error) {
 	buf := pool.Get().(*bytes.Buffer)
 	buf.Reset()
-
+	defer pool.Put(buf)
 	err := tpl.Execute(buf, req)
 	if err != nil {
-		pool.Put(buf)
-		return 0, err
+		return "", err
 	}
 	sqlStr := buf.String()
-	pool.Put(buf)
+	return sqlStr, nil
+}
 
+func Query(db DBQuery, sqlStr string, req, resp interface{},
+	limit int, fn func(reflect.StructField) string, f int) (int, error) {
 	row, err := db.Query(sqlStr)
 	if err != nil {
 		return 0, err
@@ -61,22 +62,12 @@ type DBExec interface {
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 }
 
-func Exec(db DBExec, tpl TemplateExecute, req interface{}) (sql.Result, error) {
-	buf := pool.Get().(*bytes.Buffer)
-	buf.Reset()
-
-	err := tpl.Execute(buf, req)
-	if err != nil {
-		pool.Put(buf)
-		return nil, err
-	}
-	sqlStr := buf.String()
-	pool.Put(buf)
+func Exec(db DBExec, sqlStr string, req interface{}) (sql.Result, error) {
 	return db.Exec(sqlStr)
 }
 
-func ExecRowsAffected(db DBExec, tpl TemplateExecute, req interface{}) (int, error) {
-	resu, err := Exec(db, tpl, req)
+func ExecRowsAffected(db DBExec, sqlStr string, req interface{}) (int, error) {
+	resu, err := Exec(db, sqlStr, req)
 	if err != nil {
 		return 0, err
 	}
@@ -87,8 +78,8 @@ func ExecRowsAffected(db DBExec, tpl TemplateExecute, req interface{}) (int, err
 	return int(aff), nil
 }
 
-func ExecLastInsertId(db DBExec, tpl TemplateExecute, req interface{}) (int, error) {
-	resu, err := Exec(db, tpl, req)
+func ExecLastInsertId(db DBExec, sqlStr string, req interface{}) (int, error) {
+	resu, err := Exec(db, sqlStr, req)
 	if err != nil {
 		return 0, err
 	}

@@ -15,9 +15,6 @@ import (
 	"gopkg.in/grm.v1/cmd/grm/logo"
 )
 
-//
-var f = ffmt.NewOptional(10, ffmt.StlyeP, ffmt.CanFilterDuplicate|ffmt.CanRowSpan)
-
 func main() {
 
 	app := cli.App{}
@@ -179,6 +176,14 @@ func run(limit, threads int, pkg, tag, base, out string) {
 		fmt.Println(string(aaa))
 		return
 	}
+
+	or, _ := ioutil.ReadFile(out)
+	if string(or) == string(aaa) {
+		fmt.Println("Unchanged sql go file!")
+		return
+	}
+
+	fmt.Println("Generate sql go file!")
 	err = ioutil.WriteFile(out, aaa, 0666)
 	if err != nil {
 		ffmt.Mark(err)
