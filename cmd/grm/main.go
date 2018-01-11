@@ -127,9 +127,9 @@ func run(limit, threads int, pkg, tag, base, out string) {
 	tpl.Funcs(grm.Funcs)
 
 	ff := []string{}
-	err := filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			return nil
 		}
 		if info.IsDir() {
 			return nil
@@ -140,12 +140,8 @@ func run(limit, threads int, pkg, tag, base, out string) {
 		ff = append(ff, path)
 		return nil
 	})
-	if err != nil {
-		ffmt.Mark(err)
-		return
-	}
 
-	_, err = grm.ParseSqlFiles(tpl, 0, ff...)
+	_, err := grm.ParseSqlFiles(tpl, 0, ff...)
 	if err != nil {
 		ffmt.Mark(err)
 		return

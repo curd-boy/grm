@@ -49,7 +49,7 @@ func Query(db DBQuery, sqlStr string, req, resp interface{},
 	if err != nil {
 		return 0, err
 	}
-	defer row.Close()
+
 	i, err := rows.RowsScan(row, resp, limit, fn, f)
 	if err != nil {
 		return 0, err

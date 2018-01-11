@@ -2,17 +2,27 @@ package grm
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"net/url"
 )
 
 var defaultDBCache = NewDBCache()
 
-func RegisterWithDB(alias, driverName, dataSourceName string) (*sql.DB, error) {
-	return defaultDBCache.RegisterWithDB(alias, driverName, dataSourceName)
+func RegisterWithDB(alias, source string) (*sql.DB, error) {
+	return defaultDBCache.RegisterWithDB(alias, source)
+}
+
+func Register(source string) (*sql.DB, error) {
+	return defaultDBCache.Register(source)
 }
 
 func GetWithDB(alias string) (*sql.DB, error) {
 	return defaultDBCache.GetWithDB(alias)
+}
+
+func Get() (*sql.DB, error) {
+	return defaultDBCache.Get()
 }
 
 type DBCache struct {
@@ -25,11 +35,24 @@ func NewDBCache() *DBCache {
 	}
 }
 
-func (d *DBCache) RegisterWithDB(alias, driverName, dataSourceName string) (*sql.DB, error) {
+func (d *DBCache) RegisterWithDB(alias, source string) (*sql.DB, error) {
 	_, ok := d.mp[alias]
 	if ok {
 		return nil, fmt.Errorf("%s already exist", alias)
 	}
+
+	driverName := ""
+	dataSourceName := ""
+	u, err := url.Parse(source)
+	if err != nil {
+		return nil, err
+	}
+	if u.Opaque != "" {
+		return nil, errors.New("Error RegisterWithDB: " + source)
+	}
+	driverName = u.Scheme
+	dataSourceName = source[len(u.Scheme)+3:]
+
 	db, err := sql.Open(driverName, dataSourceName)
 	if err != nil {
 		return nil, err
@@ -43,10 +66,18 @@ func (d *DBCache) RegisterWithDB(alias, driverName, dataSourceName string) (*sql
 	return db, nil
 }
 
+func (d *DBCache) Register(source string) (*sql.DB, error) {
+	return d.RegisterWithDB("", source)
+}
+
 func (d *DBCache) GetWithDB(alias string) (*sql.DB, error) {
 	db := d.mp[alias]
 	if db == nil {
 		return nil, fmt.Errorf("%s not exist", alias)
 	}
 	return db, nil
+}
+
+func (d *DBCache) Get() (*sql.DB, error) {
+	return d.GetWithDB("")
 }
