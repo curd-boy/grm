@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"gopkg.in/go-grm/rows.v1"
+	"gopkg.in/go-grm/sqlparser.v1"
 )
 
 var pool = sync.Pool{
@@ -40,6 +41,13 @@ func Execute(tpl TemplateExecute, req interface{}) (string, error) {
 		return "", err
 	}
 	sqlStr := buf.String()
+
+	stat, err := sqlparser.Parse(sqlStr)
+	if err != nil {
+		return "", err
+	}
+
+	sqlStr = sqlparser.String(stat)
 	return sqlStr, nil
 }
 
