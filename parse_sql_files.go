@@ -28,7 +28,7 @@ func parseSqlFiles(t *template.Template, commit int, paths []string) (*template.
 			if filepath.Ext(path) != ext {
 				return nil
 			}
-			filenames = append(filenames, path[:len(path)-len(ext)])
+			filenames = append(filenames, path)
 			return nil
 		})
 	}
@@ -38,7 +38,7 @@ func parseSqlFiles(t *template.Template, commit int, paths []string) (*template.
 
 	mc := regexp.MustCompile("--.*\n")
 	for _, filename := range filenames {
-		b, err := ioutil.ReadFile(filename + ext)
+		b, err := ioutil.ReadFile(filename)
 		if err != nil {
 			return nil, err
 		}
