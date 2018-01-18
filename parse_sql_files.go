@@ -9,7 +9,15 @@ import (
 	"text/template"
 )
 
-func ParseSqlFiles(t *template.Template, commit int, paths ...string) (*template.Template, error) {
+func ParseSqlFilesArgs(t *template.Template, paths ...string) (*template.Template, error) {
+	return parseSqlFiles(t, 0, paths)
+}
+
+func ParseSqlFiles(t *template.Template, paths ...string) (*template.Template, error) {
+	return parseSqlFiles(t, 1, paths)
+}
+
+func parseSqlFiles(t *template.Template, commit int, paths []string) (*template.Template, error) {
 	ext := ".sql"
 	filenames := []string{}
 	for _, path := range paths {

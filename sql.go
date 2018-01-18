@@ -4,12 +4,17 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"io"
 	"reflect"
 	"sync"
 
-	"gopkg.in/go-grm/rows.v1"
-	"gopkg.in/go-grm/sqlparser.v1"
+	ffmt "gopkg.in/ffmt.v1"
+	"gopkg.in/grm.v1/rows"
+	"gopkg.in/grm.v1/sqlparser"
+	"gopkg.in/grm.v1/sqlparser/dependency/querypb"
+	"gopkg.in/grm.v1/sqlparser/dependency/sqltypes"
 )
 
 var pool = sync.Pool{
@@ -32,23 +37,85 @@ type DBQuery interface {
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 }
 
-func Execute(tpl TemplateExecute, req interface{}) (string, error) {
+func toBindVariable(args interface{}) (bindVariables map[string]*querypb.BindVariable, extras map[string]sqlparser.Encodable, err error) {
+	v := reflect.ValueOf(args)
+	for v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	bindVariables = map[string]*querypb.BindVariable{}
+	extras = map[string]sqlparser.Encodable{}
+	switch v.Kind() {
+	case reflect.Struct:
+		t := v.Type()
+		j := t.NumField()
+		for i := 0; i != j; i++ {
+			tf := t.Field(i)
+			vf := v.Field(i)
+			bv, err := sqltypes.BuildBindVariable(vf.Interface())
+			if err != nil {
+				return bindVariables, extras, err
+			}
+			bindVariables[tf.Name] = bv
+		}
+	case reflect.Map:
+		for _, k := range v.MapKeys() {
+			vf := v.MapIndex(k)
+			bv, err := sqltypes.BuildBindVariable(vf.Interface())
+			if err != nil {
+				return bindVariables, extras, err
+			}
+			bindVariables[fmt.Sprint(k.Interface())] = bv
+		}
+	}
+	return bindVariables, extras, nil
+}
+
+func Execute(tpl TemplateExecute, req BaseData) (string, error) {
+	if tpl == nil {
+		return "", errors.New("Error Execute: Template is nil")
+	}
+
 	buf := pool.Get().(*bytes.Buffer)
-	buf.Reset()
 	defer pool.Put(buf)
+
+	buf.Reset()
 	err := tpl.Execute(buf, req)
 	if err != nil {
+		ffmt.Mark(err)
 		return "", err
 	}
-	sqlStr := buf.String()
 
-	stat, err := sqlparser.Parse(sqlStr)
+	stat, err := sqlparser.Parse(buf.String())
+	if err != nil {
+		ffmt.Mark(buf.String())
+		ffmt.Mark(err)
+		return "", err
+	}
+
+	buf.Reset()
+	tb := &sqlparser.TrackedBuffer{Buffer: buf}
+	stat.Format(tb)
+
+	// Not needed bind
+	if !tb.HasBindVars() {
+		return buf.String(), nil
+	}
+	ffmt.Mark(buf.String())
+
+	b, e, err := toBindVariable(req.Data)
 	if err != nil {
 		return "", err
 	}
 
-	sqlStr = sqlparser.String(stat)
-	return sqlStr, nil
+	pq := tb.ParsedQuery()
+
+	d, err := pq.GenerateQuery(b, e)
+	if err != nil {
+		return "", err
+	}
+
+	return string(d), nil
 }
 
 func Query(db DBQuery, sqlStr string, req, resp interface{},
