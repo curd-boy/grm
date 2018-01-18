@@ -7,7 +7,7 @@ import (
 	"gopkg.in/ffmt.v1"
 )
 
-func TestA(t *testing.T) {
+func TestReadAtLine(t *testing.T) {
 	d := `-- @Type Select
 -- @Req  LotteryCountRecordId int       "抽奖次数id"
 -- @Req  GroupBy              []string  "分组"
