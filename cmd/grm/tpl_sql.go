@@ -38,16 +38,15 @@ func init() {
 	Template.Funcs(grm.Funcs)
 	template.Must(grm.ParseSqlFiles(Template, Path))
 }
-
 {{range .Methods}}
 {{if eq .Type "Select"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
-func {{.Name}}(db grm.DBQuery, req *Req{{.Name}}) (resp {{.Slice}}*Resp{{.Name}},err error) {
+func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}},err error) {
 	name := "{{.Name}}"
 	data := grm.BaseData{
 		Name: name,
-		Data: req,
+		{{if .Req}}Data: req,{{end}}
 	}
 	
 	var sql string
@@ -63,10 +62,16 @@ func {{.Name}}(db grm.DBQuery, req *Req{{.Name}}) (resp {{.Slice}}*Resp{{.Name}}
 	_, err = grm.Query(db, sql, data, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
+{{if .Req}}
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
+
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+	return {{.Name}}(db, &r)
+}
+{{end}}
 // Resp{{.Name}} ...
 type Resp{{.Name}} struct { {{range .Resp}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
@@ -74,11 +79,11 @@ type Resp{{.Name}} struct { {{range .Resp}}
 {{else if eq .Type "Update"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
-func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
+func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
 	data := grm.BaseData{
 		Name: name,
-		Data: req,
+		{{if .Req}}Data: req,{{end}}
 	}
 	
 	var sql string
@@ -93,18 +98,24 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 	
 	return grm.ExecRowsAffected(db, sql, data)
 }
+{{if .Req}}
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
+
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+	return {{.Name}}(db, &r)
+}
+{{end}}
 {{else if eq .Type "Delete"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
-func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
+func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
 	data := grm.BaseData{
 		Name: name,
-		Data: req,
+		{{if .Req}}Data: req,{{end}}
 	}
 	
 	var sql string
@@ -119,18 +130,24 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 	
 	return grm.ExecRowsAffected(db, sql, data)
 }
+{{if .Req}}
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
+
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+	return {{.Name}}(db, &r)
+}
+{{end}}
 {{else if eq .Type "Insert"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
-func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
+func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
 	data := grm.BaseData{
 		Name: name,
-		Data: req,
+		{{if .Req}}Data: req,{{end}}
 	}
 	
 	var sql string
@@ -145,10 +162,49 @@ func {{.Name}}(db grm.DBExec, req *Req{{.Name}}) (count int,err error) {
 	
 	return grm.ExecLastInsertId(db, sql, data)
 }
+{{if .Req}}
 // Req{{.Name}} ...
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
+
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+	return {{.Name}}(db, &r)
+}
+{{end}}
+{{else if eq .Type "Exec"}}
+// {{.Name}} {{.Comment}}
+//line {{.Line}}
+func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
+	name := "{{.Name}}"
+	data := grm.BaseData{
+		Name: name,
+		{{if .Req}}Data: req,{{end}}
+	}
+	
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), data)
+	if err != nil {
+		return 
+	}
+	
+	if Println != nil {
+		Println(sql)
+	}
+	
+	_, err = grm.Exec(db, sql, data)
+	return err
+}
+{{if .Req}}
+// Req{{.Name}} ...
+type Req{{.Name}} struct { {{range .Req}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+}
+
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+	return {{.Name}}(db, &r)
+}
+{{end}}
 {{end}}
 {{end}}
 `
