@@ -88,7 +88,6 @@ func Execute(tpl TemplateExecute, req BaseData) (string, error) {
 
 	stat, err := sqlparser.Parse(buf.String())
 	if err != nil {
-		ffmt.Mark(buf.String())
 		ffmt.Mark(err)
 		return "", err
 	}
@@ -101,7 +100,6 @@ func Execute(tpl TemplateExecute, req BaseData) (string, error) {
 	if !tb.HasBindVars() {
 		return buf.String(), nil
 	}
-	ffmt.Mark(buf.String())
 
 	b, e, err := toBindVariable(req.Data)
 	if err != nil {
