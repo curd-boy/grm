@@ -7,17 +7,22 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	ffmt "gopkg.in/ffmt.v1"
 )
 
-func ParseSqlFilesArgs(t *template.Template, paths ...string) (*template.Template, error) {
-	return parseSqlFiles(t, 0, paths)
+func ParseSqlFilesArgs(t *template.Template, out string, paths ...string) (*template.Template, error) {
+	if out != "" {
+		out = filepath.Dir(filepath.Clean(out))
+	}
+	return parseSqlFiles(t, 0, out, paths)
 }
 
 func ParseSqlFiles(t *template.Template, paths ...string) (*template.Template, error) {
-	return parseSqlFiles(t, 1, paths)
+	return parseSqlFiles(t, 1, "", paths)
 }
 
-func parseSqlFiles(t *template.Template, commit int, paths []string) (*template.Template, error) {
+func parseSqlFiles(t *template.Template, commit int, out string, paths []string) (*template.Template, error) {
 	ext := ".sql"
 	filenames := []string{}
 	for _, path := range paths {
@@ -47,7 +52,18 @@ func parseSqlFiles(t *template.Template, commit int, paths []string) (*template.
 		}
 		s := string(b)
 
+		if out != "" {
+			filename = filepath.Clean(filename)
+			filename0, err := filepath.Rel(out, filename)
+			if err != nil {
+				ffmt.Mark(err)
+			} else {
+				filename = filename0
+			}
+		}
+
 		filename = strings.Replace(filename, `\`, `/`, -1)
+
 		tmpl := t.New(filename)
 		_, err = tmpl.Parse(s)
 		if err != nil {

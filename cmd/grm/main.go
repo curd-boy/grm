@@ -141,7 +141,7 @@ func run(limit, threads int, pkg, tag, base, out string) {
 		return nil
 	})
 
-	_, err := grm.ParseSqlFilesArgs(tpl, ff...)
+	_, err := grm.ParseSqlFilesArgs(tpl, out, ff...)
 	if err != nil {
 		ffmt.Mark(err)
 		return

@@ -38,6 +38,7 @@ func init() {
 	Template.Funcs(grm.Funcs)
 	template.Must(grm.ParseSqlFiles(Template, Path))
 }
+
 {{range .Methods}}
 {{if eq .Type "Select"}}
 // {{.Name}} {{.Comment}}
@@ -64,15 +65,18 @@ func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Sli
 }
 {{if .Req}}
 // Req{{.Name}} ...
+//line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
 
+//line {{.Line}}
 func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
 {{end}}
 // Resp{{.Name}} ...
+//line {{.Line}}
 type Resp{{.Name}} struct { {{range .Resp}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
@@ -100,10 +104,12 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 }
 {{if .Req}}
 // Req{{.Name}} ...
+//line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
 
+//line {{.Line}}
 func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
@@ -132,10 +138,12 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 }
 {{if .Req}}
 // Req{{.Name}} ...
+//line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
 
+//line {{.Line}}
 func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
@@ -164,10 +172,12 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 }
 {{if .Req}}
 // Req{{.Name}} ...
+//line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
 
+//line {{.Line}}
 func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
@@ -197,10 +207,12 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 }
 {{if .Req}}
 // Req{{.Name}} ...
+//line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
 
+//line {{.Line}}
 func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
@@ -266,6 +278,10 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 		}
 
 		l, _ := v.ErrorContext(v.Tree.Root)
+
+		if ci := strings.LastIndex(l, ":"); ci >= 0 {
+			l = l[:ci]
+		}
 		m := &Method{
 			Line: l,
 			Name: v.Tree.Name,
