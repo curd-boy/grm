@@ -23,11 +23,6 @@ var pool = sync.Pool{
 	},
 }
 
-type BaseData struct {
-	Name string
-	Data interface{}
-}
-
 type TemplateExecute interface {
 	Execute(wr io.Writer, data interface{}) error
 }
@@ -71,7 +66,7 @@ func toBindVariable(args interface{}) (bindVariables map[string]*querypb.BindVar
 	return bindVariables, extras, nil
 }
 
-func Execute(tpl TemplateExecute, req BaseData) (string, error) {
+func Execute(tpl TemplateExecute, req interface{}) (string, error) {
 	if tpl == nil {
 		return "", errors.New("Error Execute: Template is nil")
 	}
@@ -101,7 +96,11 @@ func Execute(tpl TemplateExecute, req BaseData) (string, error) {
 		return buf.String(), nil
 	}
 
-	b, e, err := toBindVariable(req.Data)
+	if req == nil {
+		return "", errors.New("Error Execute: No binding data")
+	}
+
+	b, e, err := toBindVariable(req)
 	if err != nil {
 		return "", err
 	}

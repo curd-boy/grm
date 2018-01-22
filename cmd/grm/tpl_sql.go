@@ -45,13 +45,9 @@ func init() {
 //line {{.Line}}
 func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}},err error) {
 	name := "{{.Name}}"
-	data := grm.BaseData{
-		Name: name,
-		{{if .Req}}Data: req,{{end}}
-	}
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), data)
+	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -60,7 +56,14 @@ func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Sli
 		Println(sql)
 	}
 
-	_, err = grm.Query(db, sql, data, &resp, MaxLimit, FieldName, MaxFork)
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+	
+	_, err = grm.Query(db, sql, {{if .Req}}req{{else}}nil{{end}}, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 {{if .Req}}
@@ -85,13 +88,9 @@ type Resp{{.Name}} struct { {{range .Resp}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
-	data := grm.BaseData{
-		Name: name,
-		{{if .Req}}Data: req,{{end}}
-	}
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), data)
+	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -100,7 +99,14 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 		Println(sql)
 	}
 	
-	return grm.ExecRowsAffected(db, sql, data)
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+	
+	return grm.ExecRowsAffected(db, sql, {{if .Req}}req{{else}}nil{{end}})
 }
 {{if .Req}}
 // Req{{.Name}} ...
@@ -119,13 +125,9 @@ func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error)
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
-	data := grm.BaseData{
-		Name: name,
-		{{if .Req}}Data: req,{{end}}
-	}
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), data)
+	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -133,8 +135,15 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 	if Println != nil {
 		Println(sql)
 	}
+
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
 	
-	return grm.ExecRowsAffected(db, sql, data)
+	return grm.ExecRowsAffected(db, sql, {{if .Req}}req{{else}}nil{{end}})
 }
 {{if .Req}}
 // Req{{.Name}} ...
@@ -153,13 +162,9 @@ func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error)
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
-	data := grm.BaseData{
-		Name: name,
-		{{if .Req}}Data: req,{{end}}
-	}
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), data)
+	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -167,8 +172,15 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 	if Println != nil {
 		Println(sql)
 	}
+
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
 	
-	return grm.ExecLastInsertId(db, sql, data)
+	return grm.ExecLastInsertId(db, sql, {{if .Req}}req{{else}}nil{{end}})
 }
 {{if .Req}}
 // Req{{.Name}} ...
@@ -187,13 +199,9 @@ func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error)
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 	name := "{{.Name}}"
-	data := grm.BaseData{
-		Name: name,
-		{{if .Req}}Data: req,{{end}}
-	}
-	
+
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), data)
+	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -202,7 +210,14 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 		Println(sql)
 	}
 	
-	_, err = grm.Exec(db, sql, data)
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+	
+	_, err = grm.Exec(db, sql, {{if .Req}}req{{else}}nil{{end}})
 	return err
 }
 {{if .Req}}
