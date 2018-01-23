@@ -1,8 +1,12 @@
 package grm
 
 import (
+	"bytes"
 	"encoding/csv"
 	"io"
+	"strings"
+
+	ffmt "gopkg.in/ffmt.v1"
 )
 
 func ReadAtLine(r io.Reader) ([][]string, error) {
@@ -16,4 +20,24 @@ func ReadAtLine(r io.Reader) ([][]string, error) {
 		return nil, err
 	}
 	return d, nil
+}
+
+func WriterAtLine(ff [][]string) *bytes.Buffer {
+
+	for k1, v1 := range ff {
+		for k2, v2 := range v1 {
+			if strings.Contains(v2, " ") {
+				ff[k1][k2] = `"` + v2 + `"`
+			}
+		}
+	}
+
+	buf := bytes.NewBuffer(nil)
+
+	tt := ffmt.FmtTable(ff)
+	for _, v := range tt {
+		buf.WriteString(v)
+		buf.WriteByte('\n')
+	}
+	return buf
 }

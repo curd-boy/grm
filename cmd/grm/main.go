@@ -12,6 +12,7 @@ import (
 	"gopkg.in/ffmt.v1"
 	"gopkg.in/grm.v1"
 	"gopkg.in/grm.v1/cli"
+	sqlfmt "gopkg.in/grm.v1/cmd/grm/format"
 	"gopkg.in/grm.v1/cmd/grm/logo"
 )
 
@@ -60,6 +61,24 @@ func Commands() []*cli.Command {
 			Aliases:     []string{"gen", "g"},
 			Usage:       "Generate commands",
 			Subcommands: SubcommandsGenerate(),
+		},
+		{
+			Name:    "format",
+			Aliases: []string{"fmt", "f"},
+			Usage:   "Format sql file",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "filepath",
+					Aliases: []string{"f"},
+					Usage:   "Sql file path",
+					Value:   "./",
+				},
+			},
+			Action: func(c *cli.Context) error {
+
+				path := c.String("filepath")
+				return sqlfmt.FormatDir(path)
+			},
 		},
 	}
 	return r
