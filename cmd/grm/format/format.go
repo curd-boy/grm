@@ -41,7 +41,7 @@ func Format(src []byte) []byte {
 	n := []byte("\n")
 	ss := bytes.Split(src, n)
 
-	dists := [][]byte{}
+	dists0 := [][]byte{}
 	d := bytes.NewBuffer(nil)
 	for _, v := range ss {
 		if bytes.Index(v, []byte("--")) != 0 {
@@ -52,15 +52,27 @@ func Format(src []byte) []byte {
 				}
 				ft := grm.WriterAtLine(ral)
 
-				dists = append(dists, ft.Bytes())
+				dists0 = append(dists0, ft.Bytes())
 				d.Reset()
 			}
-			dists = append(dists, v)
+			dists0 = append(dists0, v)
 			continue
 		}
 
 		d.Write(v)
 		d.WriteByte('\n')
 	}
-	return bytes.Join(dists, n)
+
+	dists1 := [][]byte{}
+	bb := false
+	for _, v := range dists0 {
+		if len(v) != 0 {
+			dists1 = append(dists1, v)
+			bb = true
+		} else if bb {
+			dists1 = append(dists1, v)
+			bb = false
+		}
+	}
+	return bytes.Join(dists1, n)
 }

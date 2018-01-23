@@ -343,8 +343,12 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 }
 
 func NewParameter(v []string) *Parameter {
-	ts := v[3 : len(v)-1]
-	com := v[len(v)-1]
+	ts := []string{}
+	com := ""
+	if len(v) >= 3 {
+		ts = v[3 : len(v)-1]
+		com = v[len(v)-1]
+	}
 	b := true
 
 	t := "sql:"

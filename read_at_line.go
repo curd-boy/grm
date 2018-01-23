@@ -36,7 +36,7 @@ func WriterAtLine(ff [][]string) *bytes.Buffer {
 
 	tt := ffmt.FmtTable(ff)
 	for _, v := range tt {
-		buf.WriteString(v)
+		buf.WriteString(strings.TrimSpace(v))
 		buf.WriteByte('\n')
 	}
 	return buf
