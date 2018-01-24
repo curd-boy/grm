@@ -360,7 +360,7 @@ func NewParameter(v []string) *Parameter {
 	}
 
 	if b {
-		ts = append(ts, t+rows.Hump2Snake(v[1]))
+		ts = append(ts, t+`"`+rows.Hump2Snake(v[1])+`"`)
 	}
 
 	sort.Strings(ts)
