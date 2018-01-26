@@ -8,6 +8,7 @@ import (
 
 	ffmt "gopkg.in/ffmt.v1"
 	grm "gopkg.in/grm.v1"
+	rows "gopkg.in/grm.v1/rows"
 )
 
 func FormatDir(pa string) error {
@@ -50,9 +51,18 @@ func Format(src []byte) []byte {
 				if err != nil {
 					ffmt.Mark(err)
 				}
-				ft := grm.WriterAtLine(ral)
+				for k0, v0 := range ral {
+					if len(v0) > 2 {
+						switch v0[1] {
+						case "@Req", "@Resp":
+							ral[k0][2] = rows.Snake2Hump(ral[k0][2])
+						}
+					}
+				}
 
-				dists0 = append(dists0, ft.Bytes())
+				ft := grm.WriterAtLine(ral)
+				ts := bytes.TrimSuffix(ft.Bytes(), []byte("\n"))
+				dists0 = append(dists0, ts)
 				d.Reset()
 			}
 			dists0 = append(dists0, v)
@@ -63,16 +73,5 @@ func Format(src []byte) []byte {
 		d.WriteByte('\n')
 	}
 
-	dists1 := [][]byte{}
-	bb := false
-	for _, v := range dists0 {
-		if len(v) != 0 {
-			dists1 = append(dists1, v)
-			bb = true
-		} else if bb {
-			dists1 = append(dists1, v)
-			bb = false
-		}
-	}
-	return bytes.Join(dists1, n)
+	return bytes.Join(dists0, n)
 }
