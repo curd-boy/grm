@@ -43,7 +43,7 @@ func init() {
 {{if eq .Type "Select"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
-func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}},err error) {
+func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}}, err error) {
 	name := "{{.Name}}"
 	
 	var sql string
@@ -66,6 +66,7 @@ func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Sli
 	_, err = grm.Query(db, sql, {{if .Req}}req{{else}}nil{{end}}, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
+
 {{if .Req}}
 // Req{{.Name}} ...
 //line {{.Line}}
@@ -83,6 +84,63 @@ func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp {{.Slice}}*Resp{{.Name}}, 
 type Resp{{.Name}} struct { {{range .Resp}}
 	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
 }
+
+
+
+
+
+{{if .Count}}
+// {{.Name}}Count {{.Comment}}
+//line {{.Line}}
+func {{.Name}}Count(db grm.DBQuery{{if .ReqCount}}, req *Req{{.Name}}Count{{end}}) (resp *Resp{{.Name}}Count, err error) {
+	name := "{{.Name}}"
+	
+	var sql string
+	sql, err = grm.ExecuteCount(Template.Lookup(name), {{if .ReqCount}}req{{else}}nil{{end}})
+	if err != nil {
+		return 
+	}
+	
+	if Println != nil {
+		Println(sql)
+	}
+
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+	
+	_, err = grm.Query(db, sql, {{if .ReqCount}}req{{else}}nil{{end}}, &resp, MaxLimit, FieldName, MaxFork)
+	return
+}
+
+{{if .ReqCount}}
+// Req{{.Name}}Count ...
+//line {{.Line}}
+type Req{{.Name}}Count struct { {{range .ReqCount}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+}
+
+//line {{.Line}}
+func (r Req{{.Name}}Count) {{.Name}}Count(db grm.DBQuery) (resp *Resp{{.Name}}Count, err error) {
+	return {{.Name}}Count(db, &r)
+}
+{{end}}
+// Resp{{.Name}}Count ...
+//line {{.Line}}
+type Resp{{.Name}}Count struct {
+	Count int
+}
+{{end}}
+
+
+
+
+
+
+
 {{else if eq .Type "Update"}}
 // {{.Name}} {{.Comment}}
 //line {{.Line}}
@@ -255,13 +313,15 @@ type TplData struct {
 }
 
 type Method struct {
-	Line    string
-	Name    string
-	Type    string
-	Comment string
-	Slice   string
-	Req     []*Parameter
-	Resp    []*Parameter
+	Line     string
+	Name     string
+	Type     string
+	Comment  string
+	Slice    string
+	Req      []*Parameter
+	ReqCount []*Parameter
+	Resp     []*Parameter
+	Count    bool
 }
 
 type Parameter struct {
@@ -312,6 +372,8 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 				continue
 			}
 			switch v[0] {
+			case "@Count":
+				m.Count = true
 			case "@Type":
 				if len(v) >= 2 {
 					m.Type = v[1]
@@ -327,7 +389,11 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 
 			case "@Req":
 				if len(v) >= 4 {
-					m.Req = append(m.Req, NewParameter(v))
+					r := NewParameter(v)
+					m.Req = append(m.Req, r)
+					if m.Count {
+						m.ReqCount = append(m.ReqCount, r)
+					}
 				}
 			case "@Resp":
 				if len(v) >= 4 {
