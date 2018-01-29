@@ -56,6 +56,21 @@ func Format(src []byte) []byte {
 						switch v0[1] {
 						case "@Req", "@Resp":
 							ral[k0][2] = rows.Snake2Hump(ral[k0][2])
+							if len(v0) < 4 {
+								ral[k0] = append(ral[k0], "string")
+							}
+
+							if ral[k0][3] == "" {
+								ral[k0][3] = "string"
+							}
+
+							if len(v0) < 5 {
+								ral[k0] = append(ral[k0], ral[k0][2])
+							}
+
+							if ral[k0][4] == "" {
+								ral[k0][4] = ral[k0][2]
+							}
 						}
 					}
 				}
