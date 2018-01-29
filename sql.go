@@ -67,6 +67,29 @@ func toBindVariable(args interface{}) (bindVariables map[string]*querypb.BindVar
 }
 
 func Execute(tpl TemplateExecute, req interface{}) (string, error) {
+	return execute(tpl, req, false)
+}
+
+func ExecuteCount(tpl TemplateExecute, req interface{}) (string, error) {
+	return execute(tpl, req, true)
+}
+
+// count(1) AS count
+var cac = sqlparser.SelectExprs{
+	&sqlparser.AliasedExpr{
+		Expr: &sqlparser.FuncExpr{
+			Name: sqlparser.NewColIdent("count"),
+			Exprs: sqlparser.SelectExprs{
+				&sqlparser.AliasedExpr{
+					Expr: sqlparser.NewIntVal([]byte("1")),
+				},
+			},
+		},
+		As: sqlparser.NewColIdent("count"),
+	},
+}
+
+func execute(tpl TemplateExecute, req interface{}, isCount bool) (string, error) {
 	if tpl == nil {
 		return "", errors.New("Error Execute: Template is nil")
 	}
@@ -85,6 +108,15 @@ func Execute(tpl TemplateExecute, req interface{}) (string, error) {
 	if err != nil {
 		ffmt.Mark(err)
 		return "", err
+	}
+
+	if isCount {
+		switch st := stat.(type) {
+		case *sqlparser.Select:
+			st.Limit = nil
+			st.OrderBy = nil
+			st.SelectExprs = cac
+		}
 	}
 
 	buf.Reset()
