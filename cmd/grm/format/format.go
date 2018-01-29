@@ -45,7 +45,7 @@ func Format(src []byte) []byte {
 	dists0 := [][]byte{}
 	d := bytes.NewBuffer(nil)
 	for _, v := range ss {
-		if bytes.Index(v, []byte("--")) != 0 {
+		if bytes.Index(v, []byte("-- @")) != 0 {
 			if d.Len() != 0 {
 				ral, err := grm.ReadAtLine(d)
 				if err != nil {
