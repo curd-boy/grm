@@ -53,7 +53,7 @@ func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Sli
 	name := "{{.Name}}"
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
+	sql, err = grm.Execute{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -93,7 +93,7 @@ func {{.Name}}Count(db grm.DBQuery{{if .ReqCount}}, req *Req{{.Name}}Count{{end}
 	name := "{{.Name}}"
 	
 	var sql string
-	sql, err = grm.ExecuteCount(Template.Lookup(name), {{if .ReqCount}}req{{else}}nil{{end}})
+	sql, err = grm.ExecuteCount{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .ReqCount}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -134,7 +134,7 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 	name := "{{.Name}}"
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
+	sql, err = grm.Execute{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -166,7 +166,7 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 	name := "{{.Name}}"
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
+	sql, err = grm.Execute{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -198,7 +198,7 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 	name := "{{.Name}}"
 	
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
+	sql, err = grm.Execute{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -230,7 +230,7 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 	name := "{{.Name}}"
 
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
+	sql, err = grm.Execute{{if .DDL}}DDL{{end}}(Template.Lookup(name), {{if .Req}}req{{else}}nil{{end}})
 	if err != nil {
 		return 
 	}
@@ -288,6 +288,7 @@ type Method struct {
 	ReqCount []*Parameter
 	Resp     []*Parameter
 	Count    bool
+	DDL      bool
 }
 
 type Parameter struct {
@@ -340,6 +341,8 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 			switch v[0] {
 			case "@Count":
 				m.Count = true
+			case "@DDL":
+				m.DDL = true
 			case "@Type":
 				if len(v) >= 2 {
 					m.Type = v[1]

@@ -67,11 +67,19 @@ func toBindVariable(args interface{}) (bindVariables map[string]*querypb.BindVar
 }
 
 func Execute(tpl TemplateExecute, req interface{}) (string, error) {
-	return execute(tpl, req, false)
+	return execute(tpl, req, false, false)
+}
+
+func ExecuteDDL(tpl TemplateExecute, req interface{}) (string, error) {
+	return execute(tpl, req, false, true)
 }
 
 func ExecuteCount(tpl TemplateExecute, req interface{}) (string, error) {
-	return execute(tpl, req, true)
+	return execute(tpl, req, true, false)
+}
+
+func ExecuteDDLCount(tpl TemplateExecute, req interface{}) (string, error) {
+	return execute(tpl, req, true, true)
 }
 
 // count(1) AS count
@@ -89,7 +97,7 @@ var cac = sqlparser.SelectExprs{
 	},
 }
 
-func execute(tpl TemplateExecute, req interface{}, isCount bool) (string, error) {
+func execute(tpl TemplateExecute, req interface{}, isCount, isDDL bool) (string, error) {
 	if tpl == nil {
 		return "", errors.New("Error Execute: Template is nil")
 	}
@@ -104,10 +112,19 @@ func execute(tpl TemplateExecute, req interface{}, isCount bool) (string, error)
 		return "", err
 	}
 
-	stat, err := sqlparser.Parse(buf.String())
-	if err != nil {
-		ffmt.Mark(err)
-		return "", err
+	var stat sqlparser.Statement
+	if isDDL {
+		stat, err = sqlparser.ParseStrictDDL(buf.String())
+		if err != nil {
+			ffmt.Mark(err)
+			return "", err
+		}
+	} else {
+		stat, err = sqlparser.Parse(buf.String())
+		if err != nil {
+			ffmt.Mark(err)
+			return "", err
+		}
 	}
 
 	if isCount {
