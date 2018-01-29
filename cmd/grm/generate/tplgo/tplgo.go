@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gopkg.in/grm.v1"
+	grm "gopkg.in/grm.v1"
 	"gopkg.in/grm.v1/rows"
 )
 
@@ -74,7 +74,7 @@ type Req{{.Name}} struct { {{range .Req}}
 }
 
 //line {{.Line}}
-func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp *Resp{{.Name}}, err error) {
+func (r Req{{.Name}}) {{.Name}}(db grm.DBQuery) (resp {{.Slice}}*Resp{{.Name}}, err error) {
 	return {{.Name}}(db, &r)
 }
 {{end}}
