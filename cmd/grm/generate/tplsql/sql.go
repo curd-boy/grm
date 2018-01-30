@@ -32,82 +32,6 @@ func init() {
 	template.Must(grm.ParseSqlFiles(Template, Path))
 }
 
-// GetTable 获取 指定库的所有表
-//line sql/tables/tables.sql:17
-func GetTable(db grm.DBQuery, req *ReqGetTable) (resp []*RespGetTable, err error) {
-	name := "GetTable"
-
-	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), req)
-	if err != nil {
-		return
-	}
-
-	if Println != nil {
-		Println(sql)
-	}
-
-	if db == nil {
-		db, err = grm.Get()
-		if err != nil {
-			return
-		}
-	}
-
-	_, err = grm.Query(db, sql, req, &resp, MaxLimit, FieldName, MaxFork)
-	return
-}
-
-// ReqGetTable ...
-//line sql/tables/tables.sql:17
-type ReqGetTable struct {
-	TableSchema string `sql:"table_schema"` // 数据库名
-}
-
-// RespGetTable ...
-//line sql/tables/tables.sql:17
-type RespGetTable struct {
-	TableName string `sql:"table_name"` // 所有表
-}
-
-// GetTableCount 获取 指定库的所有表
-//line sql/tables/tables.sql:17
-func GetTableCount(db grm.DBQuery, req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
-	name := "GetTable"
-
-	var sql string
-	sql, err = grm.ExecuteCount(Template.Lookup(name), req)
-	if err != nil {
-		return
-	}
-
-	if Println != nil {
-		Println(sql)
-	}
-
-	if db == nil {
-		db, err = grm.Get()
-		if err != nil {
-			return
-		}
-	}
-
-	_, err = grm.Query(db, sql, req, &resp, MaxLimit, FieldName, MaxFork)
-	return
-}
-
-// ReqGetTableCount ...
-//line sql/tables/tables.sql:17
-type ReqGetTableCount struct {
-	TableSchema string `sql:"table_schema"` // 数据库名
-}
-
-// RespGetTableCount ...
-//line sql/tables/tables.sql:17
-type RespGetTableCount struct {
-	Count int
-}
-
 // GetColumn 获取 指定库表的结构体
 //line sql/tables/tables.sql:36
 func GetColumn(db grm.DBQuery, req *ReqGetColumn) (resp []*RespGetColumn, err error) {
@@ -235,4 +159,80 @@ func GetSchema(db grm.DBQuery) (resp *RespGetSchema, err error) {
 //line sql/tables/tables.sql:6
 type RespGetSchema struct {
 	TableSchema string `sql:"table_schema"` // 获取 当前数据库名
+}
+
+// GetTable 获取 指定库的所有表
+//line sql/tables/tables.sql:17
+func GetTable(db grm.DBQuery, req *ReqGetTable) (resp []*RespGetTable, err error) {
+	name := "GetTable"
+
+	var sql string
+	sql, err = grm.Execute(Template.Lookup(name), req)
+	if err != nil {
+		return
+	}
+
+	if Println != nil {
+		Println(sql)
+	}
+
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+
+	_, err = grm.Query(db, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	return
+}
+
+// ReqGetTable ...
+//line sql/tables/tables.sql:17
+type ReqGetTable struct {
+	TableSchema string `sql:"table_schema"` // 数据库名
+}
+
+// RespGetTable ...
+//line sql/tables/tables.sql:17
+type RespGetTable struct {
+	TableName string `sql:"table_name"` // 所有表
+}
+
+// GetTableCount 获取 指定库的所有表
+//line sql/tables/tables.sql:17
+func GetTableCount(db grm.DBQuery, req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
+	name := "GetTable"
+
+	var sql string
+	sql, err = grm.ExecuteCount(Template.Lookup(name), req)
+	if err != nil {
+		return
+	}
+
+	if Println != nil {
+		Println(sql)
+	}
+
+	if db == nil {
+		db, err = grm.Get()
+		if err != nil {
+			return
+		}
+	}
+
+	_, err = grm.Query(db, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	return
+}
+
+// ReqGetTableCount ...
+//line sql/tables/tables.sql:17
+type ReqGetTableCount struct {
+	TableSchema string `sql:"table_schema"` // 数据库名
+}
+
+// RespGetTableCount ...
+//line sql/tables/tables.sql:17
+type RespGetTableCount struct {
+	Count int
 }
