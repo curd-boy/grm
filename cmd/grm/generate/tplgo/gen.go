@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -18,7 +19,7 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 	tpl.Funcs(grm.Funcs)
 
 	ff := []string{}
-	filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(base, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -31,13 +32,24 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 		ff = append(ff, path)
 		return nil
 	})
-
-	_, err := grm.ParseSqlFilesArgs(tpl, out, ff...)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
-	ms, err := ParseMethods(tpl.Templates())
+
+	_, err = grm.ParseSqlFilesArgs(tpl, out, ff...)
+	if err != nil {
+		ffmt.Mark(err)
+		return err
+	}
+
+	tt := tpl.Templates()
+
+	sort.Slice(tt, func(i, j int) bool {
+		return tt[i].Name() <= tt[j].Name()
+	})
+
+	ms, err := ParseMethods(tt)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
@@ -53,25 +65,29 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 		Methods:   ms,
 	}
 
-	aaa := MakeTplData(b)
-	aaa, err = format.Source(aaa)
+	src, err := MakeTplData(b)
+	if err != nil {
+		ffmt.Mark(err)
+		return err
+	}
+	src, err = format.Source(src)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
 	if out == "" {
-		fmt.Println(string(aaa))
+		fmt.Println(string(src))
 		return nil
 	}
 
 	or, _ := ioutil.ReadFile(out)
-	if string(or) == string(aaa) {
+	if string(or) == string(src) {
 		fmt.Println("Unchanged sql go file!")
 		return nil
 	}
 
 	fmt.Println("Generate sql go file!")
-	err = ioutil.WriteFile(out, aaa, 0666)
+	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
 		ffmt.Mark(err)
 		return err

@@ -47,7 +47,7 @@ func init() {
 
 {{range .Methods}}
 {{if eq .Type "Select"}}
-// {{.Name}} {{.Comment}}
+// {{.Name}} {{.Comm}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}}, err error) {
 	name := "{{.Name}}"
@@ -77,17 +77,17 @@ func {{.Name}}(db grm.DBQuery{{if .Req}}, req *Req{{.Name}}{{end}}) (resp {{.Sli
 // Req{{.Name}} ...
 //line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 // Resp{{.Name}} ...
 //line {{.Line}}
 type Resp{{.Name}} struct { {{range .Resp}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 
 {{if .Count}}
-// {{.Name}}Count {{.Comment}}
+// {{.Name}}Count {{.Comm}}
 //line {{.Line}}
 func {{.Name}}Count(db grm.DBQuery{{if .ReqCount}}, req *Req{{.Name}}Count{{end}}) (resp *Resp{{.Name}}Count, err error) {
 	name := "{{.Name}}"
@@ -117,7 +117,7 @@ func {{.Name}}Count(db grm.DBQuery{{if .ReqCount}}, req *Req{{.Name}}Count{{end}
 // Req{{.Name}}Count ...
 //line {{.Line}}
 type Req{{.Name}}Count struct { {{range .ReqCount}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 // Resp{{.Name}}Count ...
@@ -128,7 +128,7 @@ type Resp{{.Name}}Count struct {
 {{end}}
 
 {{else if eq .Type "Update"}}
-// {{.Name}} {{.Comment}}
+// {{.Name}} {{.Comm}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
@@ -156,11 +156,11 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 // Req{{.Name}} ...
 //line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 {{else if eq .Type "Delete"}}
-// {{.Name}} {{.Comment}}
+// {{.Name}} {{.Comm}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
@@ -188,11 +188,11 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 // Req{{.Name}} ...
 //line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 {{else if eq .Type "Insert"}}
-// {{.Name}} {{.Comment}}
+// {{.Name}} {{.Comm}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,err error) {
 	name := "{{.Name}}"
@@ -220,11 +220,11 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (count int,er
 // Req{{.Name}} ...
 //line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 {{else if eq .Type "Exec"}}
-// {{.Name}} {{.Comment}}
+// {{.Name}} {{.Comm}}
 //line {{.Line}}
 func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 	name := "{{.Name}}"
@@ -253,7 +253,7 @@ func {{.Name}}(db grm.DBExec{{if .Req}}, req *Req{{.Name}}{{end}}) (err error) {
 // Req{{.Name}} ...
 //line {{.Line}}
 type Req{{.Name}} struct { {{range .Req}}
-	{{.Name}} {{.Type}} {{.Tags}} // {{.Comment}}{{end}}
+	{{.Name}} {{.Type}} {{.Tags}} // {{.Comm}}{{end}}
 }
 {{end}}
 {{end}}
@@ -262,10 +262,13 @@ type Req{{.Name}} struct { {{range .Req}}
 
 var tpl, _ = template.New("").Parse(_sql)
 
-func MakeTplData(data *TplData) []byte {
+func MakeTplData(data *TplData) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
-	tpl.Execute(buf, data)
-	return buf.Bytes()
+	err := tpl.Execute(buf, data)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 type TplData struct {
