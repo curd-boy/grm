@@ -282,7 +282,7 @@ type Method struct {
 	Line     string
 	Name     string
 	Type     string
-	Comment  string
+	Comm     string
 	Slice    string
 	Req      []*Parameter
 	ReqCount []*Parameter
@@ -292,10 +292,10 @@ type Method struct {
 }
 
 type Parameter struct {
-	Name    string
-	Type    string
-	Tags    string
-	Comment string
+	Name string
+	Type string
+	Tags string
+	Comm string
 }
 
 func ParseMethods(t []*template.Template) ([]*Method, error) {
@@ -352,8 +352,8 @@ func ParseMethods(t []*template.Template) ([]*Method, error) {
 				}
 			case "@Comm":
 				if len(v) >= 2 {
-					m.Comment += v[1]
-					m.Comment += " "
+					m.Comm += v[1]
+					m.Comm += " "
 				}
 
 			case "@Req":
@@ -400,9 +400,9 @@ func NewParameter(v []string) *Parameter {
 
 	sort.Strings(ts)
 	return &Parameter{
-		Name:    v[1],
-		Type:    v[2],
-		Tags:    "`" + strings.Join(ts, " ") + "`",
-		Comment: com,
+		Name: v[1],
+		Type: v[2],
+		Tags: "`" + strings.Join(ts, " ") + "`",
+		Comm: com,
 	}
 }

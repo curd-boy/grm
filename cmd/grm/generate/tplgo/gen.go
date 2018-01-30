@@ -13,7 +13,7 @@ import (
 	grm "gopkg.in/grm.v1"
 )
 
-func Gen(limit, threads int, pkg, tag, base, out string) {
+func Gen(limit, threads int, pkg, tag, base, out string) error {
 	tpl := template.New("sql")
 	tpl.Funcs(grm.Funcs)
 
@@ -35,12 +35,12 @@ func Gen(limit, threads int, pkg, tag, base, out string) {
 	_, err := grm.ParseSqlFilesArgs(tpl, out, ff...)
 	if err != nil {
 		ffmt.Mark(err)
-		return
+		return err
 	}
 	ms, err := ParseMethods(tpl.Templates())
 	if err != nil {
 		ffmt.Mark(err)
-		return
+		return err
 	}
 
 	b := &TplData{
@@ -57,23 +57,24 @@ func Gen(limit, threads int, pkg, tag, base, out string) {
 	aaa, err = format.Source(aaa)
 	if err != nil {
 		ffmt.Mark(err)
-		return
+		return err
 	}
 	if out == "" {
 		fmt.Println(string(aaa))
-		return
+		return nil
 	}
 
 	or, _ := ioutil.ReadFile(out)
 	if string(or) == string(aaa) {
 		fmt.Println("Unchanged sql go file!")
-		return
+		return nil
 	}
 
 	fmt.Println("Generate sql go file!")
 	err = ioutil.WriteFile(out, aaa, 0666)
 	if err != nil {
 		ffmt.Mark(err)
-		return
+		return err
 	}
+	return nil
 }

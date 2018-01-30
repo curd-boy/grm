@@ -6,6 +6,7 @@ import (
 	"gopkg.in/grm.v1/cli"
 	sqlfmt "gopkg.in/grm.v1/cmd/grm/format"
 	"gopkg.in/grm.v1/cmd/grm/generate/tplgo"
+	"gopkg.in/grm.v1/cmd/grm/generate/tplsql"
 	"gopkg.in/grm.v1/cmd/grm/logo"
 )
 
@@ -82,7 +83,7 @@ func SubcommandsGenerate() []*cli.Command {
 		{
 			Name:    "go",
 			Aliases: []string{"g"},
-			Usage:   "Generate go file",
+			Usage:   "Generate a go file called sql file",
 			Flags: []cli.Flag{
 				&cli.IntFlag{
 					Name:    "limit",
@@ -127,8 +128,31 @@ func SubcommandsGenerate() []*cli.Command {
 				tag := c.String("tag")
 				path := c.String("filepath")
 				out := c.String("out")
-				tplgo.Gen(limit, threads, pkg, tag, path, out)
-				return nil
+				return tplgo.Gen(limit, threads, pkg, tag, path, out)
+			},
+		},
+		{
+			Name:    "sql",
+			Aliases: []string{"s"},
+			Usage:   "Generate the basic operation sql file",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:    "conn",
+					Aliases: []string{"c"},
+					Usage:   "Database connection address",
+					Value:   "",
+				},
+				&cli.StringFlag{
+					Name:    "out",
+					Aliases: []string{"o"},
+					Usage:   "Out sql file",
+					Value:   "",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				conn := c.String("conn")
+				out := c.String("out")
+				return tplsql.Gen(conn, out)
 			},
 		},
 	}
