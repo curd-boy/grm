@@ -272,33 +272,34 @@ func MakeTplData(data *TplData) ([]byte, error) {
 }
 
 type TplData struct {
-	Pkg       string
-	By        string
-	MaxLimit  int
-	MaxFork   int
-	Path      string
-	FieldName string
-	Methods   []*Method
+	Pkg       string    // 包名
+	By        string    // gen 注释
+	MaxLimit  int       // 最大读取行数限制
+	MaxFork   int       // 读取最大线程限制
+	Path      string    // sql文件引用路径
+	FieldName string    // 标签名
+	Methods   []*Method // 方法
 }
 
 type Method struct {
-	Line     string
-	Name     string
-	Type     string
-	Comm     string
-	Slice    string
-	Req      []*Parameter
-	ReqCount []*Parameter
-	Resp     []*Parameter
-	Count    bool
-	DDL      bool
+	Src      string       // sql 源文件代码
+	Line     string       // 第几行
+	Name     string       // 定义的函数名
+	Slice    string       // 类型前缀
+	Type     string       // 操作类型
+	Comm     string       // 注释
+	Req      []*Parameter // 请求的参数
+	ReqCount []*Parameter // 如果是获取count 请求的参数
+	Resp     []*Parameter // 返回的参数
+	Count    bool         // 是获取 count
+	DDL      bool         // 是 DDL
 }
 
 type Parameter struct {
-	Name string
-	Type string
-	Tags string
-	Comm string
+	Name string // 名字
+	Type string // 类型
+	Tags string // 标签
+	Comm string // 注释
 }
 
 func ParseMethods(t []*template.Template) ([]*Method, error) {

@@ -37,6 +37,7 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 		return err
 	}
 
+	// 解析文件
 	_, err = grm.ParseSqlFilesArgs(tpl, out, ff...)
 	if err != nil {
 		ffmt.Mark(err)
@@ -44,17 +45,19 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 	}
 
 	tt := tpl.Templates()
-
+	// 排序模板
 	sort.Slice(tt, func(i, j int) bool {
 		return tt[i].Name() <= tt[j].Name()
 	})
 
+	// 解析模板注解
 	ms, err := ParseMethods(tt)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
 
+	// 拼凑模板数据
 	b := &TplData{
 		Pkg:       pkg,
 		By:        strings.Join(os.Args, " "),
@@ -65,27 +68,34 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 		Methods:   ms,
 	}
 
+	// 填充数据
 	src, err := MakeTplData(b)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
+
+	// 代码格式化
 	src, err = format.Source(src)
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
+
+	// 是否直接输出
 	if out == "" {
 		fmt.Println(string(src))
 		return nil
 	}
 
+	// 比较文件
 	or, _ := ioutil.ReadFile(out)
 	if string(or) == string(src) {
 		fmt.Println("Unchanged sql go file!")
 		return nil
 	}
 
+	// 如果不同则修改
 	fmt.Println("Generate sql go file!")
 	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
