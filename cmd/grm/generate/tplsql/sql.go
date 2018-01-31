@@ -33,7 +33,7 @@ func init() {
 }
 
 // GetColumn 获取 指定库表的结构体
-//line sql/tables/tables.sql:36
+//line sql/gen_sql.sql:36
 func GetColumn(db grm.DBQuery, req *ReqGetColumn) (resp []*RespGetColumn, err error) {
 	name := "GetColumn"
 
@@ -70,14 +70,14 @@ func GetColumn(db grm.DBQuery, req *ReqGetColumn) (resp []*RespGetColumn, err er
 }
 
 // ReqGetColumn ...
-//line sql/tables/tables.sql:36
+//line sql/gen_sql.sql:36
 type ReqGetColumn struct {
 	TableSchema string `sql:"table_schema"` // 数据库名
 	TableName   string `sql:"table_name"`   // 表名
 }
 
 // RespGetColumn ...
-//line sql/tables/tables.sql:36
+//line sql/gen_sql.sql:36
 type RespGetColumn struct {
 	TableCatalog           string `sql:"table_catalog"`            // 表目录
 	TableSchema            string `sql:"table_schema"`             // 数据库名
@@ -102,7 +102,7 @@ type RespGetColumn struct {
 }
 
 // GetCreateTable mysql 获取 指定库表的结构体
-//line sql/tables/tables.sql:93
+//line sql/gen_sql.sql:93
 func GetCreateTable(db grm.DBQuery, req *ReqGetCreateTable) (resp *RespGetCreateTable, err error) {
 	name := "GetCreateTable"
 
@@ -139,20 +139,20 @@ func GetCreateTable(db grm.DBQuery, req *ReqGetCreateTable) (resp *RespGetCreate
 }
 
 // ReqGetCreateTable ...
-//line sql/tables/tables.sql:93
+//line sql/gen_sql.sql:93
 type ReqGetCreateTable struct {
 	TableSchema string `sql:"table_schema"` // 数据库名
 	TableName   string `sql:"table_name"`   // 表名
 }
 
 // RespGetCreateTable ...
-//line sql/tables/tables.sql:93
+//line sql/gen_sql.sql:93
 type RespGetCreateTable struct {
 	SqlCreateTable string `sql:"sql_create_table"` // 创建表的sql
 }
 
 // GetSchema 获取 当前数据库名
-//line sql/tables/tables.sql:6
+//line sql/gen_sql.sql:6
 func GetSchema(db grm.DBQuery) (resp *RespGetSchema, err error) {
 	name := "GetSchema"
 
@@ -189,13 +189,13 @@ func GetSchema(db grm.DBQuery) (resp *RespGetSchema, err error) {
 }
 
 // RespGetSchema ...
-//line sql/tables/tables.sql:6
+//line sql/gen_sql.sql:6
 type RespGetSchema struct {
 	TableSchema string `sql:"table_schema"` // 获取 当前数据库名
 }
 
 // GetTable 获取 指定库的所有表
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 func GetTable(db grm.DBQuery, req *ReqGetTable) (resp []*RespGetTable, err error) {
 	name := "GetTable"
 
@@ -232,19 +232,19 @@ func GetTable(db grm.DBQuery, req *ReqGetTable) (resp []*RespGetTable, err error
 }
 
 // ReqGetTable ...
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 type ReqGetTable struct {
 	TableSchema string `sql:"table_schema"` // 数据库名
 }
 
 // RespGetTable ...
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 type RespGetTable struct {
 	TableName string `sql:"table_name"` // 所有表
 }
 
 // GetTableCount 获取 指定库的所有表
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 func GetTableCount(db grm.DBQuery, req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
 	name := "GetTable"
 
@@ -281,13 +281,13 @@ func GetTableCount(db grm.DBQuery, req *ReqGetTableCount) (resp *RespGetTableCou
 }
 
 // ReqGetTableCount ...
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 type ReqGetTableCount struct {
 	TableSchema string `sql:"table_schema"` // 数据库名
 }
 
 // RespGetTableCount ...
-//line sql/tables/tables.sql:17
+//line sql/gen_sql.sql:17
 type RespGetTableCount struct {
 	Count int
 }
