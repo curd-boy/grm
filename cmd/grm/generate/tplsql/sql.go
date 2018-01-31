@@ -26,13 +26,15 @@ var (
 	Println   = func(i ...interface{}) {
 		Log.Output(3, fmt.Sprint(i...))
 	} // logger
-	DB *sql.DB // db conn
+	GetDB = func() (*sql.DB, error) {
+		db, err := grm.Get()
+		return db, err
+	} // db conn
 )
 
 func init() {
 	Template.Funcs(grm.Funcs)
 
-	DB, _ = grm.Get()
 }
 
 // GetColumn 获取 指定库表的结构体
@@ -51,17 +53,23 @@ func GetColumn(req *ReqGetColumn) (resp []*RespGetColumn, err error) {
 		temp = Template.Lookup(name)
 	}
 
-	var sql string
-	sql, err = grm.Execute(temp, req)
+	var sqlStr string
+	sqlStr, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
 
 	if Println != nil {
-		Println(sql)
+		Println(sqlStr)
 	}
 
-	_, err = grm.Query(DB, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	var db *sql.DB
+	db, err = GetDB()
+	if err != nil {
+		return
+	}
+
+	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 
@@ -113,17 +121,23 @@ func GetCreateTable(req *ReqGetCreateTable) (resp *RespGetCreateTable, err error
 		temp = Template.Lookup(name)
 	}
 
-	var sql string
-	sql, err = grm.Execute(temp, req)
+	var sqlStr string
+	sqlStr, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
 
 	if Println != nil {
-		Println(sql)
+		Println(sqlStr)
 	}
 
-	_, err = grm.Query(DB, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	var db *sql.DB
+	db, err = GetDB()
+	if err != nil {
+		return
+	}
+
+	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 
@@ -156,17 +170,23 @@ func GetSchema() (resp *RespGetSchema, err error) {
 		temp = Template.Lookup(name)
 	}
 
-	var sql string
-	sql, err = grm.Execute(temp, nil)
+	var sqlStr string
+	sqlStr, err = grm.Execute(temp, nil)
 	if err != nil {
 		return
 	}
 
 	if Println != nil {
-		Println(sql)
+		Println(sqlStr)
 	}
 
-	_, err = grm.Query(DB, sql, nil, &resp, MaxLimit, FieldName, MaxFork)
+	var db *sql.DB
+	db, err = GetDB()
+	if err != nil {
+		return
+	}
+
+	_, err = grm.Query(db, sqlStr, nil, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 
@@ -192,17 +212,23 @@ func GetTable(req *ReqGetTable) (resp []*RespGetTable, err error) {
 		temp = Template.Lookup(name)
 	}
 
-	var sql string
-	sql, err = grm.Execute(temp, req)
+	var sqlStr string
+	sqlStr, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
 
 	if Println != nil {
-		Println(sql)
+		Println(sqlStr)
 	}
 
-	_, err = grm.Query(DB, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	var db *sql.DB
+	db, err = GetDB()
+	if err != nil {
+		return
+	}
+
+	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 
@@ -234,17 +260,23 @@ func GetTableCount(req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
 		temp = Template.Lookup(name)
 	}
 
-	var sql string
-	sql, err = grm.ExecuteCount(temp, req)
+	var sqlStr string
+	sqlStr, err = grm.ExecuteCount(temp, req)
 	if err != nil {
 		return
 	}
 
 	if Println != nil {
-		Println(sql)
+		Println(sqlStr)
 	}
 
-	_, err = grm.Query(DB, sql, req, &resp, MaxLimit, FieldName, MaxFork)
+	var db *sql.DB
+	db, err = GetDB()
+	if err != nil {
+		return
+	}
+
+	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
 	return
 }
 
