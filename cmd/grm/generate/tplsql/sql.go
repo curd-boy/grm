@@ -289,5 +289,5 @@ type ReqGetTableCount struct {
 // RespGetTableCount ...
 //line sql/gen_sql.sql:17
 type RespGetTableCount struct {
-	Count int
+	Count int `sql:"count"`
 }

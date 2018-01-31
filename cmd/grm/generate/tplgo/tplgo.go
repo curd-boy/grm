@@ -151,7 +151,7 @@ type Req{{.Name}}Count struct { {{range .ReqCount}}
 // Resp{{.Name}}Count ...
 //line {{.Line}}
 type Resp{{.Name}}Count struct {
-	Count int
+	Count int ` + "`" + `sql:"count"` + "`" + `
 }
 {{end}}
 
