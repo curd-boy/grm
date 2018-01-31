@@ -37,14 +37,14 @@ func Gen(conn string, out string) error {
 	}
 
 	// 获取当前库库
-	s, err := GetSchema(nil)
+	s, err := GetSchema()
 	if err != nil {
 		ffmt.Mark(err)
 		return err
 	}
 
 	// 获取表
-	t, err := GetTable(nil, &ReqGetTable{
+	t, err := GetTable(&ReqGetTable{
 		TableSchema: s.TableSchema,
 	})
 	if err != nil {
@@ -63,7 +63,7 @@ func Gen(conn string, out string) error {
 
 	ttd := []*DefinesTplData{}
 	for _, v := range t {
-		resp, err := GetCreateTable(nil, &ReqGetCreateTable{
+		resp, err := GetCreateTable(&ReqGetCreateTable{
 			TableSchema: s.TableSchema,
 			TableName:   v.TableName,
 		})
@@ -80,7 +80,7 @@ func Gen(conn string, out string) error {
 			Sql:  resp.SqlCreateTable,
 		})
 
-		col, err := GetColumn(nil, &ReqGetColumn{
+		col, err := GetColumn(&ReqGetColumn{
 			TableSchema: s.TableSchema,
 			TableName:   v.TableName,
 		})
