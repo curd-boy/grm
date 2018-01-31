@@ -120,6 +120,12 @@ func SubcommandsGenerate() []*cli.Command {
 					Usage:   "out file",
 					Value:   "",
 				},
+				&cli.BoolFlag{
+					Name:    "grayscale",
+					Aliases: []string{"g"},
+					Usage:   "grayscale update",
+					Value:   false,
+				},
 			},
 			Action: func(c *cli.Context) error {
 				limit := c.Int("limit")
@@ -128,7 +134,8 @@ func SubcommandsGenerate() []*cli.Command {
 				tag := c.String("tag")
 				path := c.String("filepath")
 				out := c.String("out")
-				return tplgo.Gen(limit, threads, pkg, tag, path, out)
+				grayscale := c.Bool("grayscale")
+				return tplgo.Gen(limit, threads, pkg, tag, path, out, grayscale)
 			},
 		},
 		{

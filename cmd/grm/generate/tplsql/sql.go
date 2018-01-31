@@ -3,6 +3,7 @@
 package tplsql
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
@@ -14,12 +15,11 @@ import (
 )
 
 var (
-	begin     = time.Now()
+	begin     = time.Now()                                             // start time
 	MaxLimit  = 10000                                                  // Max read rows limit
 	FieldName = rows.MakeFieldName("sql")                              // Field name
 	MaxFork   = 3                                                      // Max fork
 	Template  = template.New("tplsql")                                 // template
-	Path      = "./sql/"                                               // template file path
 	Stdout    = os.Stdout                                              // std out
 	Log       = log.New(Stdout, "[grm] ", log.LstdFlags|log.Llongfile) // Print
 	Println   = func(i ...interface{}) {
@@ -29,7 +29,7 @@ var (
 
 func init() {
 	Template.Funcs(grm.Funcs)
-	template.Must(grm.ParseSqlFiles(Template, Path))
+
 }
 
 // GetColumn 获取 指定库表的结构体
@@ -37,8 +37,19 @@ func init() {
 func GetColumn(db grm.DBQuery, req *ReqGetColumn) (resp []*RespGetColumn, err error) {
 	name := "GetColumn"
 
+	temp := Template.Lookup(name)
+	if temp == nil {
+		var src []byte
+		src, err = base64.StdEncoding.DecodeString("CgotLSBAVHlwZSBTZWxlY3QgICAgICAgICAgICAgICAgICBbXQotLSBAQ29tbSAi6I635Y+WIOaMh+WumuW6k+ihqOeahOe7k+aehOS9kyIKLS0gQFJlcSAgVGFibGVTY2hlbWEgICAgICAgICAgICAgc3RyaW5nIOaVsOaNruW6k+WQjQotLSBAUmVxICBUYWJsZU5hbWUgICAgICAgICAgICAgICBzdHJpbmcg6KGo5ZCNCi0tIEBSZXNwIFRhYmxlQ2F0YWxvZyAgICAgICAgICAgIHN0cmluZyDooajnm67lvZUKLS0gQFJlc3AgVGFibGVTY2hlbWEgICAgICAgICAgICAgc3RyaW5nIOaVsOaNruW6k+WQjQotLSBAUmVzcCBUYWJsZU5hbWUgICAgICAgICAgICAgICBzdHJpbmcg6KGo5ZCNCi0tIEBSZXNwIENvbHVtbk5hbWUgICAgICAgICAgICAgIHN0cmluZyDlrZfmrrXlkI0KLS0gQFJlc3AgT3JkaW5hbFBvc2l0aW9uICAgICAgICAgaW50ICAgIOWtl+auteaJgOWcqOS9jee9rgotLSBAUmVzcCBDb2x1bW5EZWZhdWx0ICAgICAgICAgICBzdHJpbmcg5a2X5q616buY6K6k5YC8Ci0tIEBSZXNwIElzTnVsbGFibGUgICAgICAgICAgICAgIHN0cmluZyDog73mmK/nqbrlgLwKLS0gQFJlc3AgRGF0YVR5cGUgICAgICAgICAgICAgICAgc3RyaW5nIOaVsOaNruexu+WeiwotLSBAUmVzcCBDaGFyYWN0ZXJNYXhpbXVtTGVuZ3RoICBpbnQgICAg5a2X56ym5Liy5pyA5aSn6ZW/5bqmCi0tIEBSZXNwIENoYXJhY3Rlck9jdGV0TGVuZ3RoICAgIGludCAgICDlrZfnrKbkuLLkvY3plb/luqYKLS0gQFJlc3AgTnVtZXJpY1ByZWNpc2lvbiAgICAgICAgaW50ICAgIOaVsOWtl+eyvuW6pgotLSBAUmVzcCBOdW1lcmljU2NhbGUgICAgICAgICAgICBzdHJpbmcg5pWw5a2X5q+U5L6LCi0tIEBSZXNwIERhdGV0aW1lUHJlY2lzaW9uICAgICAgIGludCAgICDml7bpl7Tnsr7luqYKLS0gQFJlc3AgQ2hhcmFjdGVyU2V0TmFtZSAgICAgICAgc3RyaW5nIOWtl+espue8lueggQotLSBAUmVzcCBDb2xsYXRpb25OYW1lICAgICAgICAgICBzdHJpbmcg5a2X56ym57yW56CBCi0tIEBSZXNwIENvbHVtblR5cGUgICAgICAgICAgICAgIHN0cmluZyDliJfnsbvlnosKLS0gQFJlc3AgQ29sdW1uS2V5ICAgICAgICAgICAgICAgc3RyaW5nIOWIl+mUrgotLSBAUmVzcCBFeHRyYSAgICAgICAgICAgICAgICAgICBzdHJpbmcg6aKd5aSW5bGe5oCnCi0tIEBSZXNwIFByaXZpbGVnZXMgICAgICAgICAgICAgIHN0cmluZyDnibnkvpsKLS0gQFJlc3AgQ29sdW1uQ29tbWVudCAgICAgICAgICAgc3RyaW5nIOazqOmHigoKU0VMRUNUIAogICAgdGFibGVfY2F0YWxvZywKICAgIHRhYmxlX3NjaGVtYSwKICAgIHRhYmxlX25hbWUsCiAgICBjb2x1bW5fbmFtZSwKICAgIG9yZGluYWxfcG9zaXRpb24sCiAgICBjb2x1bW5fZGVmYXVsdCwKICAgIGlzX251bGxhYmxlLAogICAgZGF0YV90eXBlLAogICAgY2hhcmFjdGVyX21heGltdW1fbGVuZ3RoLAogICAgY2hhcmFjdGVyX29jdGV0X2xlbmd0aCwKICAgIG51bWVyaWNfcHJlY2lzaW9uLAogICAgbnVtZXJpY19zY2FsZSwKICAgIGRhdGV0aW1lX3ByZWNpc2lvbiwKICAgIGNoYXJhY3Rlcl9zZXRfbmFtZSwKICAgIGNvbGxhdGlvbl9uYW1lLAogICAgY29sdW1uX3R5cGUsCiAgICBjb2x1bW5fa2V5LAogICAgZXh0cmEsCiAgICBwcml2aWxlZ2VzLAogICAgY29sdW1uX2NvbW1lbnQKRlJPTQogICAgaW5mb3JtYXRpb25fc2NoZW1hLmNvbHVtbnMKV0hFUkUKICAgIHRhYmxlX3NjaGVtYSA9IDpUYWJsZVNjaGVtYQogICAgICAgIEFORCB0YWJsZV9uYW1lID0gOlRhYmxlTmFtZQpPUkRFUiBCWSBvcmRpbmFsX3Bvc2l0aW9uOwo=")
+		if err != nil {
+			return
+		}
+		Template.New(name).Parse(string(src))
+		temp = Template.Lookup(name)
+	}
+
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), req)
+	sql, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
@@ -95,8 +106,19 @@ type RespGetColumn struct {
 func GetCreateTable(db grm.DBQuery, req *ReqGetCreateTable) (resp *RespGetCreateTable, err error) {
 	name := "GetCreateTable"
 
+	temp := Template.Lookup(name)
+	if temp == nil {
+		var src []byte
+		src, err = base64.StdEncoding.DecodeString("Ci0tIEBUeXBlIFNlbGVjdAotLSBAQ29tbSAibXlzcWwg6I635Y+WIOaMh+WumuW6k+ihqOeahOe7k+aehOS9kyIKLS0gQFJlcSAgVGFibGVTY2hlbWEgICAgICAgICAgICAgICAgICAgc3RyaW5nIOaVsOaNruW6k+WQjQotLSBAUmVxICBUYWJsZU5hbWUgICAgICAgICAgICAgICAgICAgICBzdHJpbmcg6KGo5ZCNCi0tIEBSZXNwIFNxbENyZWF0ZVRhYmxlICAgICAgICAgICAgICAgIHN0cmluZyDliJvlu7rooajnmoRzcWwKClNFTEVDVCAKICAgIENPTkNBVCgKICAgICAgICAgICAgJ0NSRUFURSBUQUJMRSBJRiBOT1QgRVhJU1RTICcsCiAgICAgICAgICAgICdgJywKICAgICAgICAgICAgdGFibGVfbmFtZSwKICAgICAgICAgICAgJ2AgKCcsCiAgICAgICAgICAgIEdST1VQX0NPTkNBVCgnXG4gICAgJywKICAgICAgICAgICAgICAgIENPTkNBVCgnYCcsIGNvbHVtbl9uYW1lLCAnYCcpLAogICAgICAgICAgICAgICAgJyAnLAogICAgICAgICAgICAgICAgY29sdW1uX3R5cGUsCiAgICAgICAgICAgICAgICAnICcsCiAgICAgICAgICAgICAgICBJRihpc19udWxsYWJsZSA9ICdOTycsICdOT1QgTlVMTCcsICdOVUxMJyksCiAgICAgICAgICAgICAgICBJRihjb2x1bW5fZGVmYXVsdCBJUyBOVUxMIE9SIGNvbHVtbl9kZWZhdWx0ID0gJycsICcnLCBDT05DQVQoJyBERUZBVUxUIFwnJywgY29sdW1uX2RlZmF1bHQsICdcJycpKSwKICAgICAgICAgICAgICAgIElGKGV4dHJhIElTIE5VTEwgT1IgZXh0cmEgPSAnJywgJycsIENPTkNBVCgnICcsIGV4dHJhKSksCiAgICAgICAgICAgICAgICBJRihjb2x1bW5fY29tbWVudCBJUyBOVUxMIE9SIGNvbHVtbl9jb21tZW50ID0gJycsICcnLCBDT05DQVQoJyBDT01NRU5UIFwnJywgY29sdW1uX2NvbW1lbnQsICdcJycpKQogICAgICAgICAgICApLAogICAgICAgICAgICAnLCcsCiAgICAgICAgICAgIChTRUxFQ1QgCiAgICAgICAgICAgICAgICBHUk9VUF9DT05DQVQoJ1xuICAgICcsIGtleV9jb2x1bW4ua2V5X2NvbHVtbikKICAgICAgICAgICAgRlJPTQogICAgICAgICAgICAgICAgKFNFTEVDVCAKICAgICAgICAgICAgICAgICAgICBDT05DQVQoCiAgICAgICAgICAgICAgICAgICAgICAgIElGKGNvbnN0cmFpbnRfbmFtZSA9ICdQUklNQVJZJywgJ1BSSU1BUlkgS0VZJywgQ09OQ0FUKCdVTklRVUUgS0VZIGAnLCBjb25zdHJhaW50X25hbWUsICdgJykpLCAKICAgICAgICAgICAgICAgICAgICAgICAgJyAoJywgCiAgICAgICAgICAgICAgICAgICAgICAgIEdST1VQX0NPTkNBVCgnIGAnLCBjb2x1bW5fbmFtZSwgJ2AnKSwgCiAgICAgICAgICAgICAgICAgICAgICAgICcgKScKICAgICAgICAgICAgICAgICAgICApIGtleV9jb2x1bW4KICAgICAgICAgICAgICAgIEZST00KICAgICAgICAgICAgICAgICAgICBpbmZvcm1hdGlvbl9zY2hlbWEua2V5X2NvbHVtbl91c2FnZQogICAgICAgICAgICAgICAgV0hFUkUKICAgICAgICAgICAgICAgICAgICB0YWJsZV9uYW1lID0gJ2EnCiAgICAgICAgICAgICAgICBHUk9VUCBCWSBjb25zdHJhaW50X25hbWUpIEFTIGtleV9jb2x1bW4KICAgICAgICAgICAgKSwKICAgICAgICAgICAgJ1xuKScsCiAgICAgICAgICAgIChTRUxFQ1QgCiAgICAgICAgICAgICAgICBDT05DQVQoCiAgICAgICAgICAgICAgICAgICAgJyBFTkdJTkU9JywKICAgICAgICAgICAgICAgICAgICBlbmdpbmUsCiAgICAgICAgICAgICAgICAgICAgJyBERUZBVUxUIENIQVJTRVQ9JywKICAgICAgICAgICAgICAgICAgICAoU0VMRUNUIAogICAgICAgICAgICAgICAgICAgICAgICBjaGFyYWN0ZXJfc2V0X25hbWUKICAgICAgICAgICAgICAgICAgICBGUk9NCiAgICAgICAgICAgICAgICAgICAgICAgIGluZm9ybWF0aW9uX3NjaGVtYS5jb2xsYXRpb25zCiAgICAgICAgICAgICAgICAgICAgV0hFUkUKICAgICAgICAgICAgICAgICAgICAgICAgY29sbGF0aW9uX25hbWUgPSB0YWJsZV9jb2xsYXRpb24KICAgICAgICAgICAgICAgICAgICApLAogICAgICAgICAgICAgICAgICAgICcgQ09NTUVOVD1cJycsCiAgICAgICAgICAgICAgICAgICAgdGFibGVfY29tbWVudCwKICAgICAgICAgICAgICAgICAgICAnXCcnIAogICAgICAgICAgICAgICAgKQogICAgICAgICAgICBGUk9NCiAgICAgICAgICAgICAgICBpbmZvcm1hdGlvbl9zY2hlbWEudGFibGVzCiAgICAgICAgICAgIFdIRVJFCiAgICAgICAgICAgICAgICB0YWJsZV9zY2hlbWEgPSA6VGFibGVTY2hlbWEgQU5EIHRhYmxlX25hbWUgPSA6VGFibGVOYW1lCiAgICAgICAgICAgICksCiAgICAgICAgICAgICc7JwogICAgKSBBUyBzcWxfY3JlYXRlX3RhYmxlCkZST00KICAgIGluZm9ybWF0aW9uX3NjaGVtYS5jb2x1bW5zCldIRVJFCiAgICB0YWJsZV9zY2hlbWEgPSA6VGFibGVTY2hlbWEgQU5EIHRhYmxlX25hbWUgPSA6VGFibGVOYW1lOwo=")
+		if err != nil {
+			return
+		}
+		Template.New(name).Parse(string(src))
+		temp = Template.Lookup(name)
+	}
+
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), req)
+	sql, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
@@ -134,8 +156,19 @@ type RespGetCreateTable struct {
 func GetSchema(db grm.DBQuery) (resp *RespGetSchema, err error) {
 	name := "GetSchema"
 
+	temp := Template.Lookup(name)
+	if temp == nil {
+		var src []byte
+		src, err = base64.StdEncoding.DecodeString("CgotLSBAVHlwZSBTZWxlY3QKLS0gQENvbW0gIuiOt+WPliDlvZPliY3mlbDmja7lupPlkI0iCi0tIEBSZXNwIFRhYmxlU2NoZW1hICAgICAgICAgc3RyaW5nICLojrflj5Yg5b2T5YmN5pWw5o2u5bqT5ZCNIgoKU0VMRUNUIERBVEFCQVNFKCkgQVMgdGFibGVfc2NoZW1hOwoK")
+		if err != nil {
+			return
+		}
+		Template.New(name).Parse(string(src))
+		temp = Template.Lookup(name)
+	}
+
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), nil)
+	sql, err = grm.Execute(temp, nil)
 	if err != nil {
 		return
 	}
@@ -166,8 +199,19 @@ type RespGetSchema struct {
 func GetTable(db grm.DBQuery, req *ReqGetTable) (resp []*RespGetTable, err error) {
 	name := "GetTable"
 
+	temp := Template.Lookup(name)
+	if temp == nil {
+		var src []byte
+		src, err = base64.StdEncoding.DecodeString("CgotLSBAVHlwZSAgU2VsZWN0ICAgICAgICAgICAgICAgIFtdCi0tIEBDb21tICAi6I635Y+WIOaMh+WumuW6k+eahOaJgOacieihqCIKLS0gQENvdW50Ci0tIEBSZXEgICBUYWJsZVNjaGVtYSAgICAgICAgICAgc3RyaW5nIOaVsOaNruW6k+WQjQotLSBAUmVzcCAgVGFibGVOYW1lICAgICAgICAgICAgIHN0cmluZyDmiYDmnInooagKClNFTEVDVCAKICAgIHRhYmxlX25hbWUKRlJPTQogICAgaW5mb3JtYXRpb25fc2NoZW1hLmNvbHVtbnMKV0hFUkUKICAgIHRhYmxlX3NjaGVtYSA9IDpUYWJsZVNjaGVtYQpHUk9VUCBCWSB0YWJsZV9uYW1lOwoK")
+		if err != nil {
+			return
+		}
+		Template.New(name).Parse(string(src))
+		temp = Template.Lookup(name)
+	}
+
 	var sql string
-	sql, err = grm.Execute(Template.Lookup(name), req)
+	sql, err = grm.Execute(temp, req)
 	if err != nil {
 		return
 	}
@@ -204,8 +248,19 @@ type RespGetTable struct {
 func GetTableCount(db grm.DBQuery, req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
 	name := "GetTable"
 
+	temp := Template.Lookup(name)
+	if temp == nil {
+		var src []byte
+		src, err = base64.StdEncoding.DecodeString("CgotLSBAVHlwZSAgU2VsZWN0ICAgICAgICAgICAgICAgIFtdCi0tIEBDb21tICAi6I635Y+WIOaMh+WumuW6k+eahOaJgOacieihqCIKLS0gQENvdW50Ci0tIEBSZXEgICBUYWJsZVNjaGVtYSAgICAgICAgICAgc3RyaW5nIOaVsOaNruW6k+WQjQotLSBAUmVzcCAgVGFibGVOYW1lICAgICAgICAgICAgIHN0cmluZyDmiYDmnInooagKClNFTEVDVCAKICAgIHRhYmxlX25hbWUKRlJPTQogICAgaW5mb3JtYXRpb25fc2NoZW1hLmNvbHVtbnMKV0hFUkUKICAgIHRhYmxlX3NjaGVtYSA9IDpUYWJsZVNjaGVtYQpHUk9VUCBCWSB0YWJsZV9uYW1lOwoK")
+		if err != nil {
+			return
+		}
+		Template.New(name).Parse(string(src))
+		temp = Template.Lookup(name)
+	}
+
 	var sql string
-	sql, err = grm.ExecuteCount(Template.Lookup(name), req)
+	sql, err = grm.ExecuteCount(temp, req)
 	if err != nil {
 		return
 	}

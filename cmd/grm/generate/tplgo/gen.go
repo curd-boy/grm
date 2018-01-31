@@ -14,7 +14,7 @@ import (
 	grm "gopkg.in/grm.v1"
 )
 
-func Gen(limit, threads int, pkg, tag, base, out string) error {
+func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 	tpl := template.New("sql")
 	tpl.Funcs(grm.Funcs)
 
@@ -59,6 +59,7 @@ func Gen(limit, threads int, pkg, tag, base, out string) error {
 
 	// 拼凑模板数据
 	b := &TplData{
+		Gray:      grayscale,
 		Pkg:       pkg,
 		By:        strings.Join(os.Args, " "),
 		MaxLimit:  limit,
