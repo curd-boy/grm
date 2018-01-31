@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"path"
 	"strings"
 	"text/template"
 
@@ -35,6 +36,9 @@ func Gen(conn string, out string) error {
 		ffmt.Mark(err)
 		return err
 	}
+
+	// 禁止输出
+	Println = nil
 
 	// 获取当前库库
 	s, err := GetSchema()
@@ -101,20 +105,24 @@ func Gen(conn string, out string) error {
 		ffmt.Mark(err)
 		return err
 	}
+	//格式化
 	src := sqlfmt.Format(buf.Bytes())
 
+	// 直接输出
 	if out == "" {
 		fmt.Println(string(src))
 		return nil
 	}
 
+	// 比较稳健
+	out = path.Join(out)
 	or, _ := ioutil.ReadFile(out)
 	if string(or) == string(src) {
-		fmt.Println("Unchanged sql file!")
+		fmt.Println("[grm] Unchanged " + out)
 		return nil
 	}
 
-	fmt.Println("Generate sql  file!")
+	fmt.Println("[grm] Generate " + out)
 	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
 		ffmt.Mark(err)

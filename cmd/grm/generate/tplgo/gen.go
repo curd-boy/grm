@@ -5,6 +5,7 @@ import (
 	"go/format"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -89,15 +90,16 @@ func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 		return nil
 	}
 
+	out = path.Join(out)
 	// 比较文件
 	or, _ := ioutil.ReadFile(out)
 	if string(or) == string(src) {
-		fmt.Println("Unchanged sql go file!")
+		fmt.Println("[grm] Unchanged " + out)
 		return nil
 	}
 
 	// 如果不同则修改
-	fmt.Println("Generate sql go file!")
+	fmt.Println("[grm] Generate " + out)
 	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
 		ffmt.Mark(err)
