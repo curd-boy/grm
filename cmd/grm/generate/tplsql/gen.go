@@ -301,7 +301,7 @@ func MakeSelectAll(table string, col []*RespGetColumn) *DefinesTplData {
 	t := fmt.Sprintf(`SELECT %s FROM %s LIMIT :Offset, :Limit;`, strings.Join(k0, ", "), "`"+table+"`")
 
 	return &DefinesTplData{
-		Type:      "Select",
+		Type:      "Select []",
 		Comm:      "Select limit offset " + table,
 		Name:      "SelectAll" + nomenclature.Snake2Hump(table),
 		Sql:       t,
