@@ -352,8 +352,6 @@ func GetDataType2GoType(dt string) string {
 
 var mysqlTypes = map[string]string{
 	"bool":      "bool",
-	"varchar":   "string",
-	"longtext":  "string",
 	"timestamp": "time.Time",
 	"date":      "time.Time",
 	"datetime":  "time.Time",
@@ -363,4 +361,7 @@ var mysqlTypes = map[string]string{
 	"smallint":  "int16",
 	"integer":   "int32",
 	"bigint":    "int64",
+	"float":     "float32",
+	"double":    "float64",
+	"decimal":   "float64",
 }

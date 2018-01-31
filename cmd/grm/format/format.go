@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	ffmt "gopkg.in/ffmt.v1"
 	grm "gopkg.in/grm.v1"
@@ -69,7 +70,7 @@ func Format(src []byte) []byte {
 							}
 
 							if ral[k0][4] == "" {
-								ral[k0][4] = ral[k0][2]
+								ral[k0][4] = strings.Replace(rows.Hump2Snake(ral[k0][2]), "_", " ", -1)
 							}
 						}
 					}
