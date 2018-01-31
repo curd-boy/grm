@@ -9,7 +9,7 @@
 -- @Comm "获取 当前数据库名"
 -- @Resp TableSchema         string "获取 当前数据库名"
 
-SELECT DATABASE() AS table_schema;
+SELECT DATABASE() AS `table_schema`;
 
 {{end}}
 
@@ -23,12 +23,12 @@ SELECT DATABASE() AS table_schema;
 -- @Resp  TableName             string 所有表
 
 SELECT 
-    table_name
+    `table_name`
 FROM
-    information_schema.columns
+    `information_schema`.`columns`
 WHERE
-    table_schema = :TableSchema
-GROUP BY table_name;
+    `table_schema` = :TableSchema
+GROUP BY `table_name`;
 
 {{end}}
 
@@ -60,33 +60,33 @@ GROUP BY table_name;
 -- @Resp Privileges              string 特供
 -- @Resp ColumnComment           string 注释
 
-SELECT 
-    table_catalog,
-    table_schema,
-    table_name,
-    column_name,
-    ordinal_position,
-    column_default,
-    is_nullable,
-    data_type,
-    character_maximum_length,
-    character_octet_length,
-    numeric_precision,
-    numeric_scale,
-    datetime_precision,
-    character_set_name,
-    collation_name,
-    column_type,
-    column_key,
-    extra,
-    privileges,
-    column_comment
+SELECT
+    `table_catalog`,
+    `table_schema`,
+    `table_name`,
+    `column_name`,
+    `ordinal_position`,
+    `column_default`,
+    `is_nullable`,
+    `data_type`,
+    `character_maximum_length`,
+    `character_octet_length`,
+    `numeric_precision`,
+    `numeric_scale`,
+    `datetime_precision`,
+    `character_set_name`,
+    `collation_name`,
+    `column_type`,
+    `column_key`,
+    `extra`,
+    `privileges`,
+    `column_comment`
 FROM
-    information_schema.columns
+    `information_schema`.`columns`
 WHERE
-    table_schema = :TableSchema
-        AND table_name = :TableName
-ORDER BY ordinal_position;
+    `table_schema` = :TableSchema
+        AND `table_name` = :TableName
+ORDER BY `ordinal_position`;
 {{end}}
 
 
@@ -101,62 +101,62 @@ SELECT
     CONCAT(
             'CREATE TABLE IF NOT EXISTS ',
             '`',
-            table_name,
+            `table_name`,
             '` (',
             GROUP_CONCAT('\n    ',
-                CONCAT('`', column_name, '`'),
+                CONCAT('`', `column_name`, '`'),
                 ' ',
-                column_type,
+                `column_type`,
                 ' ',
-                IF(is_nullable = 'NO', 'NOT NULL', 'NULL'),
-                IF(column_default IS NULL OR column_default = '', '', CONCAT(' DEFAULT \'', column_default, '\'')),
-                IF(extra IS NULL OR extra = '', '', CONCAT(' ', extra)),
-                IF(column_comment IS NULL OR column_comment = '', '', CONCAT(' COMMENT \'', column_comment, '\''))
+                IF(`is_nullable` = 'NO', 'NOT NULL', 'NULL'),
+                IF(`column_default` IS NULL OR `column_default` = '', '', CONCAT(' DEFAULT \'', `column_default`, '\'')),
+                IF(`extra` IS NULL OR `extra` = '', '', CONCAT(' ', `extra`)),
+                IF(`column_comment` IS NULL OR `column_comment` = '', '', CONCAT(' COMMENT \'', `column_comment`, '\''))
             ),
             ',',
             (SELECT 
-                GROUP_CONCAT('\n    ', key_column.key_column)
+                GROUP_CONCAT('\n    ', `key_column`.`key_column`)
             FROM
                 (SELECT 
                     CONCAT(
-                        IF(constraint_name = 'PRIMARY', 'PRIMARY KEY', CONCAT('UNIQUE KEY `', constraint_name, '`')), 
+                        IF(`constraint_name` = 'PRIMARY', 'PRIMARY KEY', CONCAT('UNIQUE KEY `', `constraint_name`, '`')), 
                         ' (', 
-                        GROUP_CONCAT(' `', column_name, '`'), 
+                        GROUP_CONCAT(' `', `column_name`, '`'), 
                         ' )'
-                    ) key_column
+                    ) `key_column`
                 FROM
-                    information_schema.key_column_usage
+                    `information_schema`.`key_column_usage`
                 WHERE
-                    table_name = 'a'
-                GROUP BY constraint_name) AS key_column
+                    `table_schema` = :TableSchema AND `table_name` = :TableName
+                GROUP BY `constraint_name`) AS `key_column`
             ),
             '\n)',
             (SELECT 
                 CONCAT(
                     ' ENGINE=',
-                    engine,
+                    `engine`,
                     ' DEFAULT CHARSET=',
                     (SELECT 
-                        character_set_name
+                        `character_set_name`
                     FROM
-                        information_schema.collations
+                        `information_schema`.`collations`
                     WHERE
-                        collation_name = table_collation
+                        `collation_name` = `table_collation`
                     ),
                     ' COMMENT=\'',
                     table_comment,
                     '\'' 
                 )
             FROM
-                information_schema.tables
+                `information_schema`.`tables`
             WHERE
-                table_schema = :TableSchema AND table_name = :TableName
+                `table_schema` = :TableSchema AND `table_name` = :TableName
             ),
             ';'
-    ) AS sql_create_table
+    ) AS `sql_create_table`
 FROM
-    information_schema.columns
+    `information_schema`.`columns`
 WHERE
-    table_schema = :TableSchema AND table_name = :TableName;
+    `table_schema` = :TableSchema AND `table_name` = :TableName;
 {{end}}
 

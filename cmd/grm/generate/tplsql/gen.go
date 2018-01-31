@@ -21,6 +21,7 @@ import (
 func Gen(conn string, out string) error {
 	ur, err := url.Parse(conn)
 	if err != nil {
+		ffmt.Mark(err)
 		return err
 	}
 
@@ -31,12 +32,14 @@ func Gen(conn string, out string) error {
 	// 打开 数据库连接
 	_, err = grm.Register(conn)
 	if err != nil {
+		ffmt.Mark(err)
 		return err
 	}
 
 	// 获取当前库库
 	s, err := GetSchema(nil)
 	if err != nil {
+		ffmt.Mark(err)
 		return err
 	}
 
@@ -45,6 +48,7 @@ func Gen(conn string, out string) error {
 		TableSchema: s.TableSchema,
 	})
 	if err != nil {
+		ffmt.Mark(err)
 		return err
 	}
 

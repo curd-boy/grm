@@ -36,6 +36,10 @@ func NewDBCache() *DBCache {
 }
 
 func (d *DBCache) RegisterWithDB(alias, source string) (*sql.DB, error) {
+	if len(source) == 0 {
+		return nil, fmt.Errorf("source")
+	}
+
 	_, ok := d.mp[alias]
 	if ok {
 		return nil, fmt.Errorf("%s already exist", alias)
