@@ -58,7 +58,7 @@ func Gen(conn string, out string) error {
 	buf := bytes.NewBuffer(nil)
 
 	ttd := []*DefinesTplData{}
-	for _, v := range t[:1] {
+	for _, v := range t {
 		resp, err := GetCreateTable(nil, &ReqGetCreateTable{
 			TableSchema: s.TableSchema,
 			TableName:   v.TableName,
