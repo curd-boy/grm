@@ -19,13 +19,12 @@ type (
 var (
 	// function
 
-	/*
-	 */
-	Hump2Snake = origin.Hump2Snake
+	/*ConvertAssign copies to dest the value in src, converting it if possible.
+	An error is returned if the copy would result in loss of information.
+	dest should be a pointer type.
 
-	/*
-	 */
-	Snake2Hump = origin.Snake2Hump
+	*/
+	ConvertAssign = origin.ConvertAssign
 
 	/*DataScan
 	v should be a pointer type.
@@ -85,29 +84,10 @@ var (
 	/*
 	 */
 	MakeFieldName = origin.MakeFieldName
-
-	/*ConvertAssign copies to dest the value in src, converting it if possible.
-	An error is returned if the copy would result in loss of information.
-	dest should be a pointer type.
-
-	*/
-	ConvertAssign = origin.ConvertAssign
 )
 
 var (
 	// value
-
-	/*
-	 */
-	MaxForkSize = origin.MaxForkSize
-
-	/*
-	 */
-	MakeSliceCap = origin.MakeSliceCap
-
-	/*
-	 */
-	MaxBuffer = origin.MaxBuffer
 
 	/*
 	 */
@@ -120,4 +100,16 @@ var (
 	/*
 	 */
 	ErrPointerNil = origin.ErrPointerNil
+
+	/*
+	 */
+	MaxForkSize = origin.MaxForkSize
+
+	/*
+	 */
+	MakeSliceCap = origin.MakeSliceCap
+
+	/*
+	 */
+	MaxBuffer = origin.MaxBuffer
 )
