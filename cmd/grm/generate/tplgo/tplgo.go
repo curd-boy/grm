@@ -57,7 +57,7 @@ func init() {
 {{if eq .Type "Select"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name}}, err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (resp {{.Slice}}*Resp{{.Name}}, err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -82,9 +82,15 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (resp {{.Slice}}*Resp{{.Name
 	}
 
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, {{if .Req}}req{{else}}nil{{end}}, &resp, MaxLimit, FieldName, MaxFork)
@@ -107,7 +113,7 @@ type Resp{{.Name}} struct { {{range .Resp}}
 {{if .Count}}
 // {{.Name}}Count {{.Comm}}
 //line {{.Line}}
-func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count{{end}}) (resp *Resp{{.Name}}Count, err error) {
+func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count, {{end}}dbs ...*sql.DB) (resp *Resp{{.Name}}Count, err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -132,9 +138,15 @@ func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count{{end}}) (resp *Resp{{
 	}
 
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, {{if .ReqCount}}req{{else}}nil{{end}}, &resp, MaxLimit, FieldName, MaxFork)
@@ -158,7 +170,7 @@ type Resp{{.Name}}Count struct {
 {{else if eq .Type "Update"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -183,9 +195,15 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
 	}
 	
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	return grm.ExecRowsAffected(db, sqlStr, {{if .Req}}req{{else}}nil{{end}})
@@ -200,7 +218,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Delete"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -225,9 +243,15 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
 	}
 	
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	return grm.ExecRowsAffected(db, sqlStr, {{if .Req}}req{{else}}nil{{end}})
@@ -242,7 +266,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Insert"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -267,11 +291,16 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (count int,err error) {
 	}
 	
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
 	}
 
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
+	}
 	return grm.ExecLastInsertId(db, sqlStr, {{if .Req}}req{{else}}nil{{end}})
 }
 {{if .Req}}
@@ -284,7 +313,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Exec"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -309,9 +338,15 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}{{end}}) (err error) {
 	}
 	
 	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return 
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Exec(db, sqlStr, {{if .Req}}req{{else}}nil{{end}})
