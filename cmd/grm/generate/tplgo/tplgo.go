@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"go/ast"
-	"sort"
 	"strings"
 	"text/template"
 
@@ -507,7 +506,6 @@ func NewParameter(v []string) *Parameter {
 		ts = append(ts, t+`"`+nomenclature.Hump2Snake(v[1])+`"`)
 	}
 
-	sort.Strings(ts)
 	return &Parameter{
 		Name: v[1],
 		Type: v[2],
