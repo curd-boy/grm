@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	ffmt "gopkg.in/ffmt.v1"
-	nomenclature "gopkg.in/go-grm/nomenclature.v1"
 	grm "gopkg.in/grm.v1"
+	namecase "gopkg.in/wzshiming/namecase.v2"
 )
 
 func FormatDir(pa string) error {
@@ -56,7 +56,7 @@ func Format(src []byte) []byte {
 					if len(v0) > 2 {
 						switch v0[1] {
 						case "@Req", "@Resp":
-							ral[k0][2] = nomenclature.Snake2Hump(ral[k0][2])
+							ral[k0][2] = namecase.ToUpperHump(ral[k0][2])
 							if len(v0) < 4 {
 								ral[k0] = append(ral[k0], "string")
 							}
@@ -70,7 +70,7 @@ func Format(src []byte) []byte {
 							}
 
 							if ral[k0][4] == "" {
-								ral[k0][4] = strings.Replace(nomenclature.Hump2Snake(ral[k0][2]), "_", " ", -1)
+								ral[k0][4] = strings.Replace(namecase.ToLowerSnake(ral[k0][2]), "_", " ", -1)
 							}
 						}
 					}
