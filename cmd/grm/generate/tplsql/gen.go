@@ -11,9 +11,9 @@ import (
 	"text/template"
 
 	ffmt "gopkg.in/ffmt.v1"
-	nomenclature "gopkg.in/go-grm/nomenclature.v1"
 	grm "gopkg.in/grm.v1"
 	sqlfmt "gopkg.in/grm.v1/cmd/grm/format"
+	namecase "gopkg.in/wzshiming/namecase.v2"
 )
 
 //go:generate grm --hl fmt -f ./sql/
@@ -80,7 +80,7 @@ func Gen(conn string, out string) error {
 		ttd = append(ttd, &DefinesTplData{
 			Type: "Exec",
 			Comm: "Create table " + v.TableName,
-			Name: "CreateTable" + nomenclature.Snake2Hump(v.TableName),
+			Name: "CreateTable" + namecase.ToUpperHump(v.TableName),
 			Sql:  resp.SqlCreateTable,
 		})
 
@@ -139,11 +139,12 @@ func MakeInsterInfo(table string, col []*RespGetColumn) *DefinesTplData {
 		if v.ColumnKey == "PRI" {
 			continue
 		}
+
 		k0 = append(k0, "`"+v.ColumnName+"`")
-		k1 = append(k1, ":"+nomenclature.Snake2Hump(v.ColumnName))
+		k1 = append(k1, ":"+namecase.ToUpperHump(v.ColumnName))
 		d = append(d, &ParameterTplData{
 			Method:    "@Req",
-			Name:      nomenclature.Snake2Hump(v.ColumnName),
+			Name:      namecase.ToUpperHump(v.ColumnName),
 			OriAsName: v.ColumnName,
 			OriName:   v.ColumnName,
 			Type:      GetDataType2GoType(v.DataType),
@@ -156,7 +157,7 @@ func MakeInsterInfo(table string, col []*RespGetColumn) *DefinesTplData {
 	return &DefinesTplData{
 		Type:      "Insert",
 		Comm:      "Inster info " + table,
-		Name:      "Inster" + nomenclature.Snake2Hump(table),
+		Name:      "Inster" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: d,
 	}
@@ -177,7 +178,7 @@ func MakeSelectFirst(table string, col []*RespGetColumn) *DefinesTplData {
 		if v.ColumnKey == "PRI" {
 			req = append(req, &ParameterTplData{
 				Method:    "@Req",
-				Name:      nomenclature.Snake2Hump(oriName),
+				Name:      namecase.ToUpperHump(oriName),
 				OriAsName: oriName,
 				OriName:   v.ColumnName,
 				Type:      GetDataType2GoType(v.DataType),
@@ -188,7 +189,7 @@ func MakeSelectFirst(table string, col []*RespGetColumn) *DefinesTplData {
 		k0 = append(k0, oriAs)
 		resp = append(resp, &ParameterTplData{
 			Method:    "@Resp",
-			Name:      nomenclature.Snake2Hump(oriName),
+			Name:      namecase.ToUpperHump(oriName),
 			OriAsName: oriName,
 			OriName:   v.ColumnName,
 			Type:      GetDataType2GoType(v.DataType),
@@ -205,7 +206,7 @@ func MakeSelectFirst(table string, col []*RespGetColumn) *DefinesTplData {
 	return &DefinesTplData{
 		Type:      "Select",
 		Comm:      "Select first " + table,
-		Name:      "SelectFirst" + nomenclature.Snake2Hump(table),
+		Name:      "SelectFirst" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: append(req, resp...),
 	}
@@ -221,7 +222,7 @@ func MakeUpdateFirst(table string, col []*RespGetColumn) *DefinesTplData {
 		if oriName == "id" {
 			oriName = table + "_id"
 		}
-		newName := nomenclature.Snake2Hump(oriName)
+		newName := namecase.ToUpperHump(oriName)
 
 		if v.ColumnKey == "PRI" {
 			req = append(req, &ParameterTplData{
@@ -254,7 +255,7 @@ func MakeUpdateFirst(table string, col []*RespGetColumn) *DefinesTplData {
 	return &DefinesTplData{
 		Type:      "Update",
 		Comm:      "Update first " + table,
-		Name:      "UpdateFirst" + nomenclature.Snake2Hump(table),
+		Name:      "UpdateFirst" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: append(req, req1...),
 	}
@@ -294,7 +295,7 @@ func MakeSelectAll(table string, col []*RespGetColumn) *DefinesTplData {
 
 		ptd := ParameterTplData{
 			Method:    "@Resp",
-			Name:      nomenclature.Snake2Hump(oriName),
+			Name:      namecase.ToUpperHump(oriName),
 			OriAsName: oriName,
 			OriName:   v.ColumnName,
 			Type:      GetDataType2GoType(v.DataType),
@@ -311,7 +312,7 @@ func MakeSelectAll(table string, col []*RespGetColumn) *DefinesTplData {
 	return &DefinesTplData{
 		Type:      "Select []",
 		Comm:      "Select limit offset " + table,
-		Name:      "SelectAll" + nomenclature.Snake2Hump(table),
+		Name:      "SelectAll" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: append(req, resp...),
 	}
@@ -328,7 +329,7 @@ func MakeDeleteFirst(table string, col []*RespGetColumn) *DefinesTplData {
 
 		ptd := ParameterTplData{
 			Method:    "@Req",
-			Name:      nomenclature.Snake2Hump(oriName),
+			Name:      namecase.ToUpperHump(oriName),
 			OriAsName: oriName,
 			OriName:   v.ColumnName,
 			Type:      GetDataType2GoType(v.DataType),
@@ -348,7 +349,7 @@ func MakeDeleteFirst(table string, col []*RespGetColumn) *DefinesTplData {
 	return &DefinesTplData{
 		Type:      "Delete",
 		Comm:      "Delete first " + table,
-		Name:      "DeleteFirst" + nomenclature.Snake2Hump(table),
+		Name:      "DeleteFirst" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: req,
 	}
