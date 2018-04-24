@@ -140,6 +140,7 @@ func MakeInsterInfo(table string, col []*RespGetColumn) *DefinesTplData {
 			continue
 		}
 
+		v.ColumnComment = strings.Replace(v.ColumnComment, "\n", " ", -1)
 		k0 = append(k0, "`"+v.ColumnName+"`")
 		k1 = append(k1, ":"+namecase.ToUpperHump(v.ColumnName))
 		d = append(d, &ParameterTplData{
@@ -186,6 +187,7 @@ func MakeSelectFirst(table string, col []*RespGetColumn) *DefinesTplData {
 			})
 		}
 
+		v.ColumnComment = strings.Replace(v.ColumnComment, "\n", " ", -1)
 		k0 = append(k0, oriAs)
 		resp = append(resp, &ParameterTplData{
 			Method:    "@Resp",
@@ -236,6 +238,7 @@ func MakeUpdateFirst(table string, col []*RespGetColumn) *DefinesTplData {
 			continue
 		}
 
+		v.ColumnComment = strings.Replace(v.ColumnComment, "\n", " ", -1)
 		k0 = append(k0, oriAsName+" = :"+newName)
 		req1 = append(req1, &ParameterTplData{
 			Method:    "@Req",
@@ -293,6 +296,7 @@ func MakeSelectAll(table string, col []*RespGetColumn) *DefinesTplData {
 			oriAs = "`id` AS `" + oriName + "`"
 		}
 
+		v.ColumnComment = strings.Replace(v.ColumnComment, "\n", " ", -1)
 		ptd := ParameterTplData{
 			Method:    "@Resp",
 			Name:      namecase.ToUpperHump(oriName),
@@ -327,6 +331,7 @@ func MakeDeleteFirst(table string, col []*RespGetColumn) *DefinesTplData {
 			oriName = table + "_id"
 		}
 
+		v.ColumnComment = strings.Replace(v.ColumnComment, "\n", " ", -1)
 		ptd := ParameterTplData{
 			Method:    "@Req",
 			Name:      namecase.ToUpperHump(oriName),
