@@ -2,8 +2,6 @@ package format
 
 import (
 	"testing"
-
-	ffmt "gopkg.in/ffmt.v1"
 )
 
 var d = `{{define "GetStatus"}}
@@ -21,5 +19,5 @@ var d = `{{define "GetStatus"}}
 
 func TestA(t *testing.T) {
 	dd := Format([]byte(d))
-	ffmt.Mark(string(dd))
+	t.Log(string(dd))
 }

@@ -7,9 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	ffmt "gopkg.in/ffmt.v1"
+	"github.com/wzshiming/namecase"
 	grm "gopkg.in/grm.v1"
-	namecase "gopkg.in/wzshiming/namecase.v2"
 )
 
 func FormatDir(pa string) error {
@@ -50,7 +49,7 @@ func Format(src []byte) []byte {
 			if d.Len() != 0 {
 				ral, err := grm.ReadAtLine(d)
 				if err != nil {
-					ffmt.Mark(err)
+					continue
 				}
 				for k0, v0 := range ral {
 					if len(v0) > 2 {

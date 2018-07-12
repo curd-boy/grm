@@ -2,9 +2,8 @@ package grm
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
-
-	"gopkg.in/ffmt.v1"
 )
 
 func TestReadAtLine(t *testing.T) {
@@ -27,5 +26,5 @@ func TestReadAtLine(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
-	ffmt.Puts(dd)
+	fmt.Println(dd)
 }

@@ -11,7 +11,6 @@ import (
 	"strings"
 	"text/template"
 
-	ffmt "gopkg.in/ffmt.v1"
 	grm "gopkg.in/grm.v1"
 )
 
@@ -34,14 +33,12 @@ func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 		return nil
 	})
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
 	// 解析文件
 	_, err = grm.ParseSqlFilesArgs(tpl, out, ff...)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -54,7 +51,6 @@ func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 	// 解析模板注解
 	ms, err := ParseMethods(tt)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -73,14 +69,12 @@ func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 	// 填充数据
 	src, err := MakeTplData(b)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
 	// 代码格式化
 	src, err = format.Source(src)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -102,7 +96,6 @@ func Gen(limit, threads int, pkg, tag, base, out string, grayscale bool) error {
 	fmt.Println("[grm] Generate " + out)
 	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 	return nil

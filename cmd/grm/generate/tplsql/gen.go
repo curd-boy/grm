@@ -10,10 +10,9 @@ import (
 	"strings"
 	"text/template"
 
-	ffmt "gopkg.in/ffmt.v1"
+	"github.com/wzshiming/namecase"
 	grm "gopkg.in/grm.v1"
 	sqlfmt "gopkg.in/grm.v1/cmd/grm/format"
-	namecase "gopkg.in/wzshiming/namecase.v2"
 )
 
 //go:generate grm --hl fmt -f ./sql/
@@ -22,7 +21,6 @@ import (
 func Gen(conn string, out string) error {
 	ur, err := url.Parse(conn)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -33,7 +31,6 @@ func Gen(conn string, out string) error {
 	// 打开 数据库连接
 	_, err = grm.Register(conn)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -43,7 +40,6 @@ func Gen(conn string, out string) error {
 	// 获取当前库库
 	s, err := GetSchema()
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -52,7 +48,6 @@ func Gen(conn string, out string) error {
 		TableSchema: s.TableSchema,
 	})
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 
@@ -60,7 +55,6 @@ func Gen(conn string, out string) error {
 	temp0 := template.New("tplsql")
 	temp, err := temp0.Parse(_sql)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 	buf := bytes.NewBuffer(nil)
@@ -72,7 +66,6 @@ func Gen(conn string, out string) error {
 			TableName:   v.TableName,
 		})
 		if err != nil {
-			ffmt.Mark(err)
 			return err
 		}
 
@@ -89,7 +82,6 @@ func Gen(conn string, out string) error {
 			TableName:   v.TableName,
 		})
 		if err != nil {
-			ffmt.Mark(err)
 			return err
 		}
 
@@ -102,7 +94,6 @@ func Gen(conn string, out string) error {
 	buf.Reset()
 	err = temp.Execute(buf, ttd)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 	//格式化
@@ -125,7 +116,6 @@ func Gen(conn string, out string) error {
 	fmt.Println("[grm] Generate " + out)
 	err = ioutil.WriteFile(out, src, 0666)
 	if err != nil {
-		ffmt.Mark(err)
 		return err
 	}
 	return nil

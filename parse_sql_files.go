@@ -7,8 +7,6 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
-
-	ffmt "gopkg.in/ffmt.v1"
 )
 
 func ParseSqlFilesArgs(t *template.Template, out string, paths ...string) (*template.Template, error) {
@@ -58,9 +56,7 @@ func parseSqlFiles(t *template.Template, commit int, out string, paths []string)
 		if out != "" {
 			filename = filepath.Clean(filename)
 			filename0, err := filepath.Rel(out, filename)
-			if err != nil {
-				ffmt.Mark(err)
-			} else {
+			if err == nil {
 				filename = filename0
 			}
 		}

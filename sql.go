@@ -10,11 +10,10 @@ import (
 	"reflect"
 	"sync"
 
-	ffmt "gopkg.in/ffmt.v1"
-	"gopkg.in/grm.v1/rows"
-	"gopkg.in/grm.v1/sqlparser"
-	"gopkg.in/grm.v1/sqlparser/dependency/querypb"
-	"gopkg.in/grm.v1/sqlparser/dependency/sqltypes"
+	"github.com/wzshiming/rows"
+	sqlparser "gopkg.in/go-grm/sqlparser.v1"
+	"gopkg.in/go-grm/sqlparser.v1/dependency/querypb"
+	"gopkg.in/go-grm/sqlparser.v1/dependency/sqltypes"
 )
 
 var pool = sync.Pool{
@@ -108,7 +107,6 @@ func execute(tpl TemplateExecute, req interface{}, isCount, isDDL bool) (string,
 	buf.Reset()
 	err := tpl.Execute(buf, req)
 	if err != nil {
-		ffmt.Mark(err)
 		return "", err
 	}
 
@@ -116,13 +114,11 @@ func execute(tpl TemplateExecute, req interface{}, isCount, isDDL bool) (string,
 	if isDDL {
 		stat, err = sqlparser.ParseStrictDDL(buf.String())
 		if err != nil {
-			ffmt.Mark(err)
 			return "", err
 		}
 	} else {
 		stat, err = sqlparser.Parse(buf.String())
 		if err != nil {
-			ffmt.Mark(err)
 			return "", err
 		}
 	}

@@ -1,6 +1,6 @@
 package logo
 
-import "gopkg.in/ffmt.v1"
+import "fmt"
 
 var logo = `
  _____
@@ -13,5 +13,5 @@ var logo = `
 `
 
 func PrintLogo(ver interface{}) {
-	ffmt.Printf(logo, ver)
+	fmt.Printf(logo, ver)
 }
