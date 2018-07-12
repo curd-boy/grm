@@ -28,6 +28,5 @@ go generate
 
 ## MIT License
 
-Copyright © 2017-2018 wzshiming<[https://github.com/wzshiming](https://github.com/wzshiming)>.
+Pouch is licensed under the MIT License. See [LICENSE](https://github.com/go-grm/grm/blob/master/LICENSE) for the full license text.
 
-MIT is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT).
