@@ -85,7 +85,7 @@ func Gen(conn string, out string) error {
 			return err
 		}
 
-		ttd = append(ttd, MakeInsterInfo(v.TableName, col))
+		ttd = append(ttd, MakeInsertInfo(v.TableName, col))
 		ttd = append(ttd, MakeDeleteFirst(v.TableName, col))
 		ttd = append(ttd, MakeSelectFirst(v.TableName, col))
 		ttd = append(ttd, MakeSelectAll(v.TableName, col))
@@ -121,7 +121,7 @@ func Gen(conn string, out string) error {
 	return nil
 }
 
-func MakeInsterInfo(table string, col []*RespGetColumn) *DefinesTplData {
+func MakeInsertInfo(table string, col []*RespGetColumn) *DefinesTplData {
 	k0 := []string{}
 	k1 := []string{}
 	d := []*ParameterTplData{}
@@ -147,8 +147,8 @@ func MakeInsterInfo(table string, col []*RespGetColumn) *DefinesTplData {
 
 	return &DefinesTplData{
 		Type:      "Insert",
-		Comm:      "Inster info " + table,
-		Name:      "Inster" + namecase.ToUpperHump(table),
+		Comm:      "Insert info " + table,
+		Name:      "Insert" + namecase.ToUpperHump(table),
 		Sql:       t,
 		Parameter: d,
 	}
