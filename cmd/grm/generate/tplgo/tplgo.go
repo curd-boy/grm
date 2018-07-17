@@ -24,7 +24,7 @@ import (
 	"text/template"
 	"time"
 
-	"gopkg.in/grm.v1"
+	grm "gopkg.in/grm.v1"
 	"gopkg.in/grm.v1/rows"
 )
 
@@ -56,7 +56,7 @@ func init() {
 {{if eq .Type "Select"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (resp {{.Slice}}*Resp{{.Name}}, err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...grm.DBQuery) (resp {{.Slice}}*Resp{{.Name}}, err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -80,7 +80,7 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (resp {{.Sli
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
+	var db grm.DBQuery
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
@@ -112,7 +112,7 @@ type Resp{{.Name}} struct { {{range .Resp}}
 {{if .Count}}
 // {{.Name}}Count {{.Comm}}
 //line {{.Line}}
-func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count, {{end}}dbs ...*sql.DB) (resp *Resp{{.Name}}Count, err error) {
+func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count, {{end}}dbs ...grm.DBQuery) (resp *Resp{{.Name}}Count, err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -136,7 +136,7 @@ func {{.Name}}Count({{if .ReqCount}}req *Req{{.Name}}Count, {{end}}dbs ...*sql.D
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
+	var db grm.DBQuery
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
@@ -169,7 +169,7 @@ type Resp{{.Name}}Count struct {
 {{else if eq .Type "Update"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...grm.DBExec) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -193,7 +193,7 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,e
 		Println(sqlStr)
 	}
 	
-	var db *sql.DB
+	var db grm.DBExec
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
@@ -217,7 +217,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Delete"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...grm.DBExec) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -241,7 +241,7 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,e
 		Println(sqlStr)
 	}
 	
-	var db *sql.DB
+	var db grm.DBExec
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
@@ -265,7 +265,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Insert"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...grm.DBExec) (count int,err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -289,7 +289,7 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (count int,e
 		Println(sqlStr)
 	}
 	
-	var db *sql.DB
+	var db grm.DBExec
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
@@ -312,7 +312,7 @@ type Req{{.Name}} struct { {{range .Req}}
 {{else if eq .Type "Exec"}}
 // {{.Name}} {{.Comm}}
 //line {{.Line}}
-func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (err error) {
+func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...grm.DBExec) (err error) {
 	name := "{{.Name}}"
 	
 	temp := Template.Lookup(name)
@@ -336,7 +336,7 @@ func {{.Name}}({{if .Req}}req *Req{{.Name}}, {{end}}dbs ...*sql.DB) (err error) 
 		Println(sqlStr)
 	}
 	
-	var db *sql.DB
+	var db grm.DBExec
 	if len(dbs) != 0 {
 		db = dbs[0]
 	}
