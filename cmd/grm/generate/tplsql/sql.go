@@ -11,7 +11,7 @@ import (
 	"text/template"
 	"time"
 
-	"gopkg.in/grm.v1"
+	grm "gopkg.in/grm.v1"
 	"gopkg.in/grm.v1/rows"
 )
 
@@ -39,7 +39,7 @@ func init() {
 
 // GetColumn 获取 指定库表的结构体
 //line sql/gen_sql.sql:36
-func GetColumn(req *ReqGetColumn) (resp []*RespGetColumn, err error) {
+func GetColumn(req *ReqGetColumn, dbs ...grm.DBQuery) (resp []*RespGetColumn, err error) {
 	name := "GetColumn"
 
 	temp := Template.Lookup(name)
@@ -63,10 +63,16 @@ func GetColumn(req *ReqGetColumn) (resp []*RespGetColumn, err error) {
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return
+	var db grm.DBQuery
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
@@ -107,7 +113,7 @@ type RespGetColumn struct {
 
 // GetCreateTable mysql 获取 指定库表的结构体
 //line sql/gen_sql.sql:93
-func GetCreateTable(req *ReqGetCreateTable) (resp *RespGetCreateTable, err error) {
+func GetCreateTable(req *ReqGetCreateTable, dbs ...grm.DBQuery) (resp *RespGetCreateTable, err error) {
 	name := "GetCreateTable"
 
 	temp := Template.Lookup(name)
@@ -131,10 +137,16 @@ func GetCreateTable(req *ReqGetCreateTable) (resp *RespGetCreateTable, err error
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return
+	var db grm.DBQuery
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
@@ -156,7 +168,7 @@ type RespGetCreateTable struct {
 
 // GetSchema 获取 当前数据库名
 //line sql/gen_sql.sql:6
-func GetSchema() (resp *RespGetSchema, err error) {
+func GetSchema(dbs ...grm.DBQuery) (resp *RespGetSchema, err error) {
 	name := "GetSchema"
 
 	temp := Template.Lookup(name)
@@ -180,10 +192,16 @@ func GetSchema() (resp *RespGetSchema, err error) {
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return
+	var db grm.DBQuery
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, nil, &resp, MaxLimit, FieldName, MaxFork)
@@ -198,7 +216,7 @@ type RespGetSchema struct {
 
 // GetTable 获取 指定库的所有表
 //line sql/gen_sql.sql:17
-func GetTable(req *ReqGetTable) (resp []*RespGetTable, err error) {
+func GetTable(req *ReqGetTable, dbs ...grm.DBQuery) (resp []*RespGetTable, err error) {
 	name := "GetTable"
 
 	temp := Template.Lookup(name)
@@ -222,10 +240,16 @@ func GetTable(req *ReqGetTable) (resp []*RespGetTable, err error) {
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return
+	var db grm.DBQuery
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
@@ -246,7 +270,7 @@ type RespGetTable struct {
 
 // GetTableCount 获取 指定库的所有表
 //line sql/gen_sql.sql:17
-func GetTableCount(req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
+func GetTableCount(req *ReqGetTableCount, dbs ...grm.DBQuery) (resp *RespGetTableCount, err error) {
 	name := "GetTable"
 
 	temp := Template.Lookup(name)
@@ -270,10 +294,16 @@ func GetTableCount(req *ReqGetTableCount) (resp *RespGetTableCount, err error) {
 		Println(sqlStr)
 	}
 
-	var db *sql.DB
-	db, err = GetDB()
-	if err != nil {
-		return
+	var db grm.DBQuery
+	if len(dbs) != 0 {
+		db = dbs[0]
+	}
+
+	if db == nil {
+		db, err = GetDB()
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = grm.Query(db, sqlStr, req, &resp, MaxLimit, FieldName, MaxFork)
