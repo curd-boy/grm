@@ -7,7 +7,7 @@ import (
 	"gopkg.in/grm.v1/cmd/grm/generate/tplgo"
 	"gopkg.in/grm.v1/cmd/grm/generate/tplsql"
 	"gopkg.in/grm.v1/cmd/grm/logo"
-	cli "gopkg.in/urfave/cli.v2"
+	cli "github.com/urfave/cli/v2"
 )
 
 func main() {
